@@ -6,13 +6,21 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "axios": "^1.6.7",
     "chokidar": "^3.5.3",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
+    "dotenv": "^16.4.3",
     "express": "~4.16.1",
+    "googleapis": "^133.0.0",
     "http-errors": "~1.6.3",
     "morgan": "~1.9.1",
     "nunjucks": "^3.2.3",
     "pug": "^3.0.2"
-  }
+  },
+  "description": "Express로 구현된 Node.js 백엔드 어플리케이션 템플릿입니다. ## 🖇️ 준비 및 확인사항",
+  "main": "app.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }

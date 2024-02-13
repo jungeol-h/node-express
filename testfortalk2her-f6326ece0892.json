@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "testfortalk2her",
+  "private_key_id": "f6326ece0892c4bf076c91887fa3a9f629976960",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCmsQhSpYvSAUYx\npnlgyZT7fAQynC74DdC0jkG3uB0wleDRuIpxnbWoX7HTPx3ZQTEa6xnZv4oz0hSB\ndl9w8NBQKJWo0o4XBYYslPfKcck5foIu7WNO1HceG0npCNR6qGwz7FO7d9h3W1PB\nj76D4rK5r9Elj12iDU/dzULN+cCwU/Pm+XE0I/jp4CPwogCC7eAptd8XS8ETCxDr\nVYo4UGdfdB4hij94jsAN8zNWeR74A9pRAr1Hm1lFJ0J6dgU1uMtDhCuWOv5uGGZS\n/ad29a+cPqBUEhBvBGHDiT08/pgTOs8tmfx8v4cGc34+QOYVFAfk9EmfiVBdSown\nKUw3yZd9AgMBAAECggEAO3E1CRfcyPpIWEtHzHKGLLoYWx3kB/QRQVnbaJMA4cMI\nxXDb+dEmJxFc/fprf/5l7vX4pXRO6dTYGCSou0M83eDjIa1YGzCOnNZQmMJD4jtR\nXD+uIr3UbomHrVDHSKhH0apMX7VInaOVNhi29RwB5QKkABNkbfX2TZ+1W3NdOeNa\n6WZCNG+UjGj0jPcxCAMW5nW5NvAJVWBPjJP17H2idu4Wnrb9SN7l6hOthfrUbfZw\n8DYCMra6/1EfEbuvFGVEw9QtVAFqzKXTqSDpt0uyNa+JzrtKa4dE9L8JrMFoGJAd\nWPuzFF32kvkMbMasBNp44fXQ7AYCYwrEG7ZHuFYcNwKBgQDO2YRjjGeV/1bQZpJr\nzif16DfQF38vdon5n6RaR3S04LNhh8Q/1X0H7paxt/PRUsz0JPOZnhpQwwKXGKRd\nQJChC1iPlHbaq66cCUTcCs8XqL1BQmD2YIy+EKkxL5qXMVTYh0zmaRj7wW3vzVtr\n+uWR9IfvEDhcZtAIFlMgPsd/DwKBgQDOTLslj2YDsXzxeuoRqruCfmPEYmjYpLUL\n6mux+HneI/ttdz7LKdm4J9gdjCLVX3jMoZiO2CnN66Ur/o/q9ldyLja8pzqU7J4X\nkZytbZ00BPJlBQcmLHDah1mADT9R+Db4GZX097ZDfSduxmQidY3g1C6FEvCkHmHb\nWOo+5PhAswKBgG97+MiWkfXcKvQjdGM6N3tn7zzujRQNtYueqTwnKxWZzdSREgq9\ni6fMxdd/J5/4GpKzn7954QEKOckp9Nx1wf2qWc742547zd43eK+H+9nqjiYwGoZv\nvytpW2cxGwbGBc62DZJZrqdxt0j5y35FOZoSy3jjqxzSJOlW7vKAI5GtAoGBALcL\nI/42lvht8gM84RSd3VPymsjz3D1lHvKco8O8ST1Nxdeht0iCMJiSWdIVtg6GcGN4\neik8KRN5ows/CikbPAmmcZC//F2I+NjGrTLAEHzIat4xMN+xDM0IzOOuXWF4kCVg\nZkp9w+1rzaIfS1e74A/9k+0lGfk0r/T0lpsJhC+7AoGBAK89KBtYJrSGDDpTBB8f\n12HqaS3KJNjirZj5KwPlWQyfMRjy/V+xpvQiOZypU6OdxY9MkD3HboOi+c1sOehm\nfRB5wpjBVkYRGU4FGoARUYA0205+FnQe9wA95azBK8Qcr1Z9xBYAZDrMuJr9yRGE\nPcZSCsd5KWD3p9+fAFc6PRwh\n-----END PRIVATE KEY-----\n",
+  "client_email": "talk2her@testfortalk2her.iam.gserviceaccount.com",
+  "client_id": "111553391713876351716",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/talk2her%40testfortalk2her.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
