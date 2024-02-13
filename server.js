@@ -154,12 +154,13 @@ app.get("/callback", async (req, res) => {
 app.get("/update-spreadsheet", async (req, res) => {
   try {
     const accessToken = req.cookies.accessToken; // 쿠키에서 액세스 토큰 가져오기
+    if (!accessToken) {
+      return res.status(401).send("액세스 토큰이 쿠키에 없습니다.");
+    }
 
-    // 주문 목록을 검색할 매개 변수 설정
     const params = {
-      start_date: "2024-01-01", // 시작일
-      end_date: "2024-02-01", // 종료일
-      // order_id: "your_order_id_here", // 특정 주문 번호 (필요한 경우)
+      start_date: "2024-01-01",
+      end_date: "2024-02-01",
     };
 
     const response = await axios.get(
@@ -169,16 +170,15 @@ app.get("/update-spreadsheet", async (req, res) => {
           Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
         },
-        params: params, // 매개 변수 추가
+        params: params,
       }
     );
 
-    // 구글 스프레드시트 업데이트 함수 호출
     await writeToSpreadsheet(response.data);
     res.send("스프레드시트가 성공적으로 업데이트 되었습니다.");
   } catch (error) {
-    console.error("Error status:", error.response?.status);
-    console.error("Error data:", error.response?.data);
+    console.error("Error status:", error.response?.status || "No status");
+    console.error("Error data:", error.response?.data || error.message);
     res
       .status(error.response?.status || 500)
       .send("주문 목록 조회 중 에러 발생");
