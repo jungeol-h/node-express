@@ -167,7 +167,7 @@ async function writeToSpreadsheet(orderData) {
 
   const request = {
     spreadsheetId: "1dIxJGxdmrcnG-3IkB8-9BoiLCQ2EHNHY5dtKhoaq9H0",
-    range: "Dashboard!A1", // "Dashboard" 시트의 A1 셀부터 시작
+    range: "시트1", // "Dashboard" 시트의 A1 셀부터 시작
     valueInputOption: "RAW",
     resource: { values: values },
   };
