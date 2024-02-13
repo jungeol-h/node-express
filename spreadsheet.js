@@ -120,7 +120,7 @@ const { google } = require("googleapis");
 
 async function writeToSpreadsheet(orderData) {
   const auth = new google.auth.GoogleAuth({
-    keyFile: "path_to_your_service_account_key.json",
+    keyFile: "testfortalk2her-f6326ece0892.json",
     scopes: "https://www.googleapis.com/auth/spreadsheets",
   });
 
@@ -156,7 +156,7 @@ async function writeToSpreadsheet(orderData) {
   values.unshift(headers); // 헤더를 값 배열의 맨 앞에 추가합니다.
 
   const request = {
-    spreadsheetId: "your_spreadsheet_id_here",
+    spreadsheetId: "1dIxJGxdmrcnG-3IkB8-9BoiLCQ2EHNHY5dtKhoaq9H0",
     range: "Dashboard!A1", // "Dashboard" 시트의 A1 셀부터 시작
     valueInputOption: "RAW",
     resource: { values: values },
