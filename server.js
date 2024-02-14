@@ -173,7 +173,6 @@ app.get("/update-spreadsheet", async (req, res) => {
         params: params,
       }
     );
-    console.log(response.data);
 
     await writeToSpreadsheet(response.data);
     res.send("스프레드시트가 성공적으로 업데이트 되었습니다.");
