@@ -1,57 +1,129 @@
 const { google } = require("googleapis");
 
-async function writeToSpreadsheet(orderData) {
+// 상수 정의
+const SHEET_NAME = "시트1";
+const SCOPES = "https://www.googleapis.com/auth/spreadsheets";
+
+async function getGoogleSheetsClient() {
   const auth = new google.auth.GoogleAuth({
     keyFile: "testfortalk2her-f6326ece0892.json",
-    scopes: "https://www.googleapis.com/auth/spreadsheets",
+    scopes: SCOPES,
   });
 
   const client = await auth.getClient();
-  const sheets = google.sheets({ version: "v4", auth: client });
+  return google.sheets({ version: "v4", auth: client });
+}
 
-  // 스프레드시트의 첫 번째 행(속성 이름이 있는 행)을 읽어옵니다.
-  const sheetPropertiesResponse = await sheets.spreadsheets.values.get({
-    spreadsheetId: "1dIxJGxdmrcnG-3IkB8-9BoiLCQ2EHNHY5dtKhoaq9H0",
-    range: "시트1!A1:ZZ1",
+async function getSheetProperties(sheets) {
+  const range = `${SHEET_NAME}!A1:ZZ1`;
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId: process.env.SPREADSHEET_ID,
+    range,
   });
-
-  // 첫 번째 행에서 읽어온 속성 이름을 배열로 저장합니다.
-  const attributes = sheetPropertiesResponse.data.values[0];
-
-  // 주문 정보에서 선택한 정보만 추출하여 스프레드시트에 매핑합니다.
-  const values = orderData.orders.map((order) => {
-    return attributes.map((attr) => {
-      // payment_method와 tax_detail 같은 특수 처리가 필요한 필드를 확인합니다.
-      if (attr === "payment_method") {
-        // payment_method가 배열인 경우, 쉼표로 구분된 문자열로 변환합니다.
-        return order.payment_method ? order.payment_method.join(", ") : "N/A";
-      } else if (attr === "tax_detail") {
-        // tax_detail 정보를 적절한 문자열 형태로 변환합니다.
-        return order.tax_detail
-          ? order.tax_detail
-              .map((tax) => `${tax.name}: ${tax.amount}`)
-              .join(", ")
-          : "N/A";
+  return response.data.values[0]; // 첫 번째 행의 속성 이름
+}
+function objectToString(obj) {
+  return Object.entries(obj)
+    .map(([key, value]) => {
+      if (value === null || value === undefined) {
+        return `${key}: N/A`;
+      } else if (typeof value === "object") {
+        return `${key}: ${objectToString(value)}`; // 재귀적으로 객체 처리
       } else {
-        // 그 외의 경우에는 직접 속성에 접근합니다.
-        return order[attr] ?? "N/A";
+        return `${key}: ${value.toString()}`;
+      }
+    })
+    .join(", ");
+}
+
+function mapOrderDataToSheetFormat(orderData, attributes) {
+  return orderData.orders.map((order) => {
+    return attributes.map((attr) => {
+      // '상품명' 열에 대한 특별 처리
+      if (attr === "상품명") {
+        if (Array.isArray(order.items) && order.items.length > 0) {
+          // items 배열 내 각 아이템의 product_name 추출 및 문자열로 결합
+          return order.items
+            .map((item) => item.product_name || "N/A")
+            .join(", ");
+        }
+        return "N/A"; // items 배열이 비어있는 경우
+      }
+
+      // 다른 속성에 대한 처리
+      let value = order[attr];
+      if (typeof value === "object" && value !== null) {
+        // 객체 타입의 속성 처리. objectToString 함수를 사용하여 재귀적으로 처리 가능
+        return objectToString(value);
+      } else if (value !== null && value !== undefined) {
+        // 값이 null이나 undefined가 아닌 경우, 문자열로 변환
+        return value.toString();
+      } else {
+        // 값이 null이나 undefined인 경우 "N/A" 반환
+        return "N/A";
       }
     });
   });
+}
 
-  const request = {
-    spreadsheetId: "1dIxJGxdmrcnG-3IkB8-9BoiLCQ2EHNHY5dtKhoaq9H0",
-    range: "시트1",
-    valueInputOption: "RAW",
-    resource: { values },
-  };
-
+async function writeToSpreadsheet(orderData) {
   try {
-    const response = await sheets.spreadsheets.values.append(request);
-    console.log(`${response.data.updates.updatedCells} cells appended.`);
+    console.log("Google Sheets 클라이언트를 가져오는 중...");
+    const sheets = await getGoogleSheetsClient();
+
+    console.log("기존 order_id 목록을 조회하는 중...");
+    const existingOrderIds = await getOrderIds(sheets);
+
+    console.log("시트 속성을 가져오는 중...");
+    const attributes = await getSheetProperties(sheets);
+    console.log(`시트 속성: ${attributes.join(", ")}`);
+
+    console.log("새로운 주문을 필터링하는 중...");
+    const newOrders = orderData.orders.filter(
+      (order) => !existingOrderIds.includes(order.order_id)
+    );
+    console.log(`추가될 새로운 주문 수: ${newOrders.length}`);
+
+    if (newOrders.length === 0) {
+      console.log("추가할 새로운 주문이 없습니다.");
+      return;
+    }
+
+    // 첫 번째 새로운 주문의 상세 정보 로그 출력
+    if (newOrders.length > 0) {
+      console.log(
+        "첫 번째 새로운 주문의 상세 정보:",
+        JSON.stringify(newOrders[0], null, 2)
+      );
+    }
+
+    console.log("새로운 주문 데이터를 스프레드시트 형식으로 매핑하는 중...");
+    const values = mapOrderDataToSheetFormat({ orders: newOrders }, attributes);
+    console.log(`매핑된 데이터: ${JSON.stringify(values[0], null, 2)}`); // 첫 번째 매핑된 데이터 로그 출력
+
+    console.log("스프레드시트에 데이터를 추가하는 중...");
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: process.env.SPREADSHEET_ID,
+      range: SHEET_NAME,
+      valueInputOption: "RAW",
+      resource: { values },
+    });
+
+    console.log(
+      `${newOrders.length}개의 새로운 주문이 스프레드시트에 추가되었습니다.`
+    );
   } catch (err) {
-    console.error("The API returned an error: " + err);
+    console.error("API 호출 중 오류 발생: ", err);
   }
+}
+
+async function getOrderIds(sheets) {
+  const range = `${SHEET_NAME}!C2:C`; // C열에서 order_id 조회
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId: process.env.SPREADSHEET_ID,
+    range,
+  });
+  return response.data.values ? response.data.values.flat() : [];
 }
 
 module.exports = { writeToSpreadsheet };
