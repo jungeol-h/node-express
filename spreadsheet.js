@@ -134,26 +134,42 @@ async function writeToSpreadsheet(orderData) {
     "Order Date",
     "Payment Date",
     "Customer ID",
+    "Customer Email",
+    "Payment Method",
     "Total Payment Amount",
     "Shipping Type",
     "Shipping Fee",
     "Discount Amount",
+    "Tax Amount",
     "Order Status",
     "Payment Status",
   ];
 
   // 주문 정보에서 선택한 정보만 추출하여 스프레드시트에 매핑합니다.
   const values = orderData.orders.map((order) => {
+    let paymentMethods = Array.isArray(order.payment_method)
+      ? order.payment_method.join(", ")
+      : order.payment_method;
+    // 세금 정보 배열을 문자열로 결합합니다.
+    let taxAmounts = Array.isArray(order.tax_detail)
+      ? order.tax_detail.map((tax) => tax.amount).join(", ")
+      : "";
+
     return [
       order.order_id,
       order.order_date,
       order.payment_date,
       order.member_id,
-      order.actual_order_amount.payment_amount,
+      order.member_email,
+      paymentMethods,
+      order.actual_order_amount ? order.actual_order_amount.payment_amount : "",
       order.shipping_type_text,
-      order.actual_order_amount.shipping_fee,
-      order.initial_order_amount.coupon_discount_price, // 예시로 쿠폰 할인금액을 할인 금액으로 사용
-      order.shipping_status === "T" ? "Shipped" : "Pending", // 배송 상태를 더 읽기 쉬운 형태로 변환
+      order.actual_order_amount ? order.actual_order_amount.shipping_fee : "",
+      order.initial_order_amount
+        ? order.initial_order_amount.coupon_discount_price
+        : "",
+      taxAmounts,
+      order.shipping_status === "T" ? "Shipped" : "Pending",
       order.paid === "T" ? "Paid" : "Unpaid",
     ];
   });
