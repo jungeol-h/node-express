@@ -134,13 +134,10 @@ async function writeToSpreadsheet(orderData) {
     "Order Date",
     "Payment Date",
     "Customer ID",
-    "Customer Email",
-    "Payment Method",
     "Total Payment Amount",
     "Shipping Type",
     "Shipping Fee",
     "Discount Amount",
-    "Tax Amount",
     "Order Status",
     "Payment Status",
   ];
@@ -152,13 +149,10 @@ async function writeToSpreadsheet(orderData) {
       order.order_date,
       order.payment_date,
       order.member_id,
-      order.member_email,
-      order.payment_method.join(", "), // 여러 결제 방법을 문자열로 결합
       order.actual_order_amount.payment_amount,
       order.shipping_type_text,
       order.actual_order_amount.shipping_fee,
       order.initial_order_amount.coupon_discount_price, // 예시로 쿠폰 할인금액을 할인 금액으로 사용
-      order.tax_detail.map((tax) => tax.amount).join(", "), // 여러 세금 정보를 문자열로 결합
       order.shipping_status === "T" ? "Shipped" : "Pending", // 배송 상태를 더 읽기 쉬운 형태로 변환
       order.paid === "T" ? "Paid" : "Unpaid",
     ];
