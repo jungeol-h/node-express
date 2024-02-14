@@ -3,13 +3,17 @@ const express = require("express");
 const axios = require("axios");
 const cookieParser = require("cookie-parser");
 
-const { writeToSpreadsheet } = require("./spreadsheet");
+const {
+  writeToSpreadsheet,
+  updateCancellationSheet,
+} = require("./utils/spreadsheet");
 const {
   getAuthUrl,
   fetchToken,
   fetchOrdersCount,
   fetchAllOrders,
-} = require("./cafe24Api");
+  fetchOrdersWithStatus,
+} = require("./api/cafe24/cafe24Api");
 
 const app = express();
 app.use(cookieParser());
@@ -59,7 +63,15 @@ app.get("/update-spreadsheet", async (req, res) => {
     );
 
     await writeToSpreadsheet({ orders: allOrders });
-    res.send("스프레드시트가 성공적으로 업데이트 되었습니다.");
+
+    const cancellationOrders = await fetchOrdersWithStatus(
+      accessToken,
+      startDate,
+      endDate,
+      "C00,C10,R00,R10,E00,E10" // 취소, 반품, 교환 상태 코드
+    );
+    await updateCancellationSheet({ orders: cancellationOrders });
+    await res.send("스프레드시트가 성공적으로 업데이트 되었습니다.");
   } catch (error) {
     handleError(res, error);
   }

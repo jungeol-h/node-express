@@ -1,7 +1,8 @@
 const { google } = require("googleapis");
 
 // 상수 정의
-const SHEET_NAME = "시트1";
+const SHEET_NAME = "cafe24_주문";
+const CANCELLATION_SHEET_NAME = "cafe24_취소";
 const SCOPES = "https://www.googleapis.com/auth/spreadsheets";
 
 async function getGoogleSheetsClient() {
@@ -72,7 +73,7 @@ async function writeToSpreadsheet(orderData) {
     const sheets = await getGoogleSheetsClient();
 
     console.log("기존 order_id 목록을 조회하는 중...");
-    const existingOrderIds = await getOrderIds(sheets);
+    const existingOrderIds = await getOrderIds(sheets, SHEET_NAME);
 
     console.log("시트 속성을 가져오는 중...");
     const attributes = await getSheetProperties(sheets);
@@ -117,13 +118,61 @@ async function writeToSpreadsheet(orderData) {
   }
 }
 
-async function getOrderIds(sheets) {
-  const range = `${SHEET_NAME}!C2:C`; // C열에서 order_id 조회
+// getOrderIds 함수를 수정하여 특정 시트의 order_id 목록을 조회할 수 있도록 함
+async function getOrderIds(sheets, sheetName) {
+  const range = `${sheetName}!C2:C`; // 주문 ID가 있는 컬럼 지정
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: process.env.SPREADSHEET_ID,
     range,
   });
   return response.data.values ? response.data.values.flat() : [];
 }
+async function updateCancellationSheet(orderData) {
+  try {
+    console.log("Google Sheets 클라이언트를 가져오는 중...");
+    const sheets = await getGoogleSheetsClient();
 
-module.exports = { writeToSpreadsheet };
+    // 'cafe24_취소' 시트의 기존 order_id 목록 조회
+    const existingOrderIds = await getOrderIds(sheets, CANCELLATION_SHEET_NAME);
+
+    console.log("시트 속성을 가져오는 중...");
+    const attributes = await getSheetProperties(
+      sheets,
+      CANCELLATION_SHEET_NAME
+    );
+
+    console.log(
+      "취소/반품/환불 주문 데이터를 스프레드시트 형식으로 매핑하는 중..."
+    );
+    const filteredOrders = orderData.orders.filter(
+      (order) =>
+        !existingOrderIds.includes(order.order_id) &&
+        (order.order_status.startsWith("C") ||
+          order.order_status.startsWith("R") ||
+          order.order_status.startsWith("E"))
+    ); // 중복되지 않고, 취소/반품/환불 상태인 주문만 필터링
+    const values = mapOrderDataToSheetFormat(
+      { orders: filteredOrders },
+      attributes
+    );
+
+    if (values.length === 0) {
+      console.log("추가할 새로운 취소/반품/환불 주문이 없습니다.");
+      return;
+    }
+
+    console.log("스프레드시트에 데이터를 추가하는 중...");
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: process.env.SPREADSHEET_ID,
+      range: cancellationSheetName, // 'cafe24_취소' 시트에 데이터 추가
+      valueInputOption: "RAW",
+      resource: { values },
+    });
+
+    console.log("스프레드시트 업데이트 완료.");
+  } catch (err) {
+    console.error("API 호출 중 오류 발생: ", err);
+  }
+}
+
+module.exports = { writeToSpreadsheet, updateCancellationSheet };
