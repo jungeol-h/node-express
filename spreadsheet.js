@@ -12,7 +12,7 @@ async function writeToSpreadsheet(orderData) {
   // 시트의 첫 번째 행(속성 이름이 있는 행)을 읽어옵니다.
   const sheetProperties = await sheets.spreadsheets.values.get({
     spreadsheetId: "1dIxJGxdmrcnG-3IkB8-9BoiLCQ2EHNHY5dtKhoaq9H0",
-    range: "Sheet1!A1:Z1",
+    range: "시트1!A1:CE1",
   });
 
   // 첫 번째 행에서 읽어온 속성 이름을 배열로 저장합니다.
@@ -37,7 +37,7 @@ async function writeToSpreadsheet(orderData) {
 
   const request = {
     spreadsheetId: "1dIxJGxdmrcnG-3IkB8-9BoiLCQ2EHNHY5dtKhoaq9H0",
-    range: "Sheet1",
+    range: "시트1",
     valueInputOption: "RAW",
     resource: { values },
   };
