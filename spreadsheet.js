@@ -9,29 +9,33 @@ async function writeToSpreadsheet(orderData) {
   const client = await auth.getClient();
   const sheets = google.sheets({ version: "v4", auth: client });
 
-  // 시트의 첫 번째 행(속성 이름이 있는 행)을 읽어옵니다.
-  const sheetProperties = await sheets.spreadsheets.values.get({
+  // 스프레드시트의 첫 번째 행(속성 이름이 있는 행)을 읽어옵니다.
+  const sheetPropertiesResponse = await sheets.spreadsheets.values.get({
     spreadsheetId: "1dIxJGxdmrcnG-3IkB8-9BoiLCQ2EHNHY5dtKhoaq9H0",
-    range: "시트1!A1:CE1",
+    range: "시트1!A1:ZZ1",
   });
 
   // 첫 번째 행에서 읽어온 속성 이름을 배열로 저장합니다.
-  const attributes = sheetProperties.data.values[0];
+  const attributes = sheetPropertiesResponse.data.values[0];
 
   // 주문 정보에서 선택한 정보만 추출하여 스프레드시트에 매핑합니다.
   const values = orderData.orders.map((order) => {
     return attributes.map((attr) => {
-      // 옵셔널 체이닝과 기본값을 사용하여 안전하게 속성에 접근
-      if (attr === "Payment Method") {
-        return order.payment_method?.join(", ") || "N/A"; // 기본값으로 "N/A"
-      } else if (attr === "Tax Amounts") {
-        return order.tax_detail?.map((tax) => tax.amount).join(", ") || "N/A";
+      // payment_method와 tax_detail 같은 특수 처리가 필요한 필드를 확인합니다.
+      if (attr === "payment_method") {
+        // payment_method가 배열인 경우, 쉼표로 구분된 문자열로 변환합니다.
+        return order.payment_method ? order.payment_method.join(", ") : "N/A";
+      } else if (attr === "tax_detail") {
+        // tax_detail 정보를 적절한 문자열 형태로 변환합니다.
+        return order.tax_detail
+          ? order.tax_detail
+              .map((tax) => `${tax.name}: ${tax.amount}`)
+              .join(", ")
+          : "N/A";
+      } else {
+        // 그 외의 경우에는 직접 속성에 접근합니다.
+        return order[attr] ?? "N/A";
       }
-      // attr을 기반으로 주문 데이터에서 해당하는 값을 찾아 매핑
-      // 실제 속성 이름과 order 객체의 키 이름 매핑 로직 필요
-      // 예시: attr -> orderKey 변환 로직 적용
-      const orderKey = transformAttrToOrderKey(attr);
-      return order[orderKey] ?? "N/A"; // 기본값으로 "N/A", orderKey가 order 객체에 없으면 "N/A" 반환
     });
   });
 
@@ -48,13 +52,6 @@ async function writeToSpreadsheet(orderData) {
   } catch (err) {
     console.error("The API returned an error: " + err);
   }
-}
-
-function transformAttrToOrderKey(attr) {
-  // attr에서 order 객체의 키로 변환하는 로직 구현
-  // 이는 attr의 형식과 order 객체의 키 형식에 따라 달라집니다.
-  // 예시 로직: 속성 이름을 소문자로 변환하고, 공백을 '_'로 대체
-  return attr.toLowerCase().replace(/\s+/g, "_");
 }
 
 module.exports = { writeToSpreadsheet };
