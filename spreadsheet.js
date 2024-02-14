@@ -1,121 +1,3 @@
-// const { google } = require("googleapis");
-
-// async function writeToSpreadsheet(orderData) {
-//   const auth = new google.auth.GoogleAuth({
-//     keyFile: "testfortalk2her-f6326ece0892.json",
-//     scopes: "https://www.googleapis.com/auth/spreadsheets",
-//   });
-
-//   const client = await auth.getClient();
-//   const sheets = google.sheets({ version: "v4", auth: client });
-
-//   const values = orderData.orders.map((order) => {
-//     return [
-//       order.order_id,
-//       order.order_date,
-//       order.payment_amount,
-//       order.additional_shipping_fee,
-//     ];
-//   });
-
-//   const request = {
-//     spreadsheetId: "1dIxJGxdmrcnG-3IkB8-9BoiLCQ2EHNHY5dtKhoaq9H0",
-//     range: "시트1",
-//     valueInputOption: "RAW",
-//     resource: { values: values },
-//   };
-
-//   try {
-//     const response = await sheets.spreadsheets.values.append(request);
-//     console.log(`${response.data.updates.updatedCells} cells appended.`);
-//   } catch (err) {
-//     console.error(err);
-//   }
-// }
-
-// module.exports = { writeToSpreadsheet };
-
-// const { google } = require("googleapis");
-
-// async function writeToSpreadsheet(orderData) {
-//   const auth = new google.auth.GoogleAuth({
-//     keyFile: "testfortalk2her-f6326ece0892.json",
-//     scopes: "https://www.googleapis.com/auth/spreadsheets",
-//   });
-
-//   const client = await auth.getClient();
-//   const sheets = google.sheets({ version: "v4", auth: client });
-
-//   // 스프레드시트에 쓸 첫 번째 행의 칼럼 이름
-//   const headers = [
-//     "order_id",
-//     "shop_no",
-//     "start_date",
-//     "end_date",
-//     "order_status",
-//     "payment_status",
-//     "member_type",
-//     "group_no",
-//     "buyer_name",
-//     "receiver_name",
-//     "name_furigana",
-//     "receiver_address",
-//     "member_id",
-//     "member_email",
-//     "product_no",
-//     "product_code",
-//     "date_type",
-//     "supplier_id",
-//     "order_place_id",
-//     "buyer_cellphone",
-//     "buyer_phone",
-//     "buyer_email",
-//     "inflow_path",
-//     "subscription",
-//     "market_order_no",
-//     "market_cancel_request",
-//     "payment_method",
-//     "payment_gateway_name",
-//     "market_seller_id",
-//     "discount_method",
-//     "discount_code",
-//     "carrier_id",
-//     "labels",
-//     "refund_status",
-//     "limit",
-//     "offset",
-//     // 추가적인 칼럼 이름을 여기에 추가하세요.
-//   ];
-
-//   // 모든 주문 정보를 포함하는 배열 생성
-//   const values = orderData.orders.map((order) => {
-//     // 주문 정보에서 필요한 데이터를 추출하여 배열로 반환
-//     return headers.map((header) => {
-//       // 각 헤더에 맞는 주문 정보를 반환 (주문 정보가 없는 경우 빈 문자열 반환)
-//       return order[header] || "";
-//     });
-//   });
-
-//   // 첫 번째 행(칼럼 이름)을 값 배열 앞에 추가
-//   values.unshift(headers);
-
-//   const request = {
-//     spreadsheetId: "1dIxJGxdmrcnG-3IkB8-9BoiLCQ2EHNHY5dtKhoaq9H0",
-//     range: "시트1", // 적절한 시트 이름으로 변경
-//     valueInputOption: "RAW",
-//     resource: { values: values },
-//   };
-
-//   try {
-//     const response = await sheets.spreadsheets.values.append(request);
-//     console.log(`${response.data.updates.updatedCells} cells appended.`);
-//   } catch (err) {
-//     console.error("The API returned an error: " + err);
-//   }
-// }
-
-// module.exports = { writeToSpreadsheet };
-
 const { google } = require("googleapis");
 
 async function writeToSpreadsheet(orderData) {
@@ -123,64 +5,41 @@ async function writeToSpreadsheet(orderData) {
     keyFile: "testfortalk2her-f6326ece0892.json",
     scopes: "https://www.googleapis.com/auth/spreadsheets",
   });
-  console.log(orderData);
 
   const client = await auth.getClient();
   const sheets = google.sheets({ version: "v4", auth: client });
 
-  // 대시보드에 표시할 정보를 선택합니다.
-  const headers = [
-    "Order ID",
-    "Order Date",
-    "Payment Date",
-    "Customer ID",
-    "Customer Email",
-    "Payment Method",
-    "Total Payment Amount",
-    "Shipping Type",
-    "Shipping Fee",
-    "Discount Amount",
-    "Tax Amount",
-    "Order Status",
-    "Payment Status",
-  ];
+  // 시트의 첫 번째 행(속성 이름이 있는 행)을 읽어옵니다.
+  const sheetProperties = await sheets.spreadsheets.values.get({
+    spreadsheetId: "1dIxJGxdmrcnG-3IkB8-9BoiLCQ2EHNHY5dtKhoaq9H0",
+    range: "Sheet1!A1:Z1",
+  });
+
+  // 첫 번째 행에서 읽어온 속성 이름을 배열로 저장합니다.
+  const attributes = sheetProperties.data.values[0];
 
   // 주문 정보에서 선택한 정보만 추출하여 스프레드시트에 매핑합니다.
   const values = orderData.orders.map((order) => {
-    let paymentMethods = Array.isArray(order.payment_method)
-      ? order.payment_method.join(", ")
-      : order.payment_method;
-    // 세금 정보 배열을 문자열로 결합합니다.
-    let taxAmounts = Array.isArray(order.tax_detail)
-      ? order.tax_detail.map((tax) => tax.amount).join(", ")
-      : "";
-
-    return [
-      order.order_id,
-      order.order_date,
-      order.payment_date,
-      order.member_id,
-      order.member_email,
-      paymentMethods,
-      order.actual_order_amount ? order.actual_order_amount.payment_amount : "",
-      order.shipping_type_text,
-      order.actual_order_amount ? order.actual_order_amount.shipping_fee : "",
-      order.initial_order_amount
-        ? order.initial_order_amount.coupon_discount_price
-        : "",
-      taxAmounts,
-      order.shipping_status === "T" ? "Shipped" : "Pending",
-      order.paid === "T" ? "Paid" : "Unpaid",
-    ];
+    return attributes.map((attr) => {
+      // 옵셔널 체이닝과 기본값을 사용하여 안전하게 속성에 접근
+      if (attr === "Payment Method") {
+        return order.payment_method?.join(", ") || "N/A"; // 기본값으로 "N/A"
+      } else if (attr === "Tax Amounts") {
+        return order.tax_detail?.map((tax) => tax.amount).join(", ") || "N/A";
+      }
+      // attr을 기반으로 주문 데이터에서 해당하는 값을 찾아 매핑
+      // 실제 속성 이름과 order 객체의 키 이름 매핑 로직 필요
+      // 예시: attr -> orderKey 변환 로직 적용
+      const orderKey = transformAttrToOrderKey(attr);
+      return order[orderKey] ?? "N/A"; // 기본값으로 "N/A", orderKey가 order 객체에 없으면 "N/A" 반환
+    });
   });
-
-  values.unshift(headers); // 헤더를 값 배열의 맨 앞에 추가합니다.
 
   const request = {
     spreadsheetId: "1dIxJGxdmrcnG-3IkB8-9BoiLCQ2EHNHY5dtKhoaq9H0",
-    range: "시트1", // "Dashboard" 시트의 A1 셀부터 시작
+    range: "Sheet1",
     valueInputOption: "RAW",
-    resource: { values: values },
+    resource: { values },
   };
 
   try {
@@ -189,6 +48,13 @@ async function writeToSpreadsheet(orderData) {
   } catch (err) {
     console.error("The API returned an error: " + err);
   }
+}
+
+function transformAttrToOrderKey(attr) {
+  // attr에서 order 객체의 키로 변환하는 로직 구현
+  // 이는 attr의 형식과 order 객체의 키 형식에 따라 달라집니다.
+  // 예시 로직: 속성 이름을 소문자로 변환하고, 공백을 '_'로 대체
+  return attr.toLowerCase().replace(/\s+/g, "_");
 }
 
 module.exports = { writeToSpreadsheet };
