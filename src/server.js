@@ -8,12 +8,16 @@ const {
   updateCancellationSheet,
 } = require("./utils/spreadsheet");
 const {
-  getAuthUrl,
+  getAuthUrlCafe24,
   fetchToken,
   fetchOrdersCount,
   fetchAllOrders,
   fetchOrdersWithStatus,
 } = require("./api/cafe24/cafe24Api");
+const {
+  fetchAuthToken,
+  fetchLastChangedProductOrders,
+} = require("./api/naver/naverApi");
 
 const app = express();
 app.use(cookieParser());
@@ -21,13 +25,13 @@ app.use(cookieParser());
 const port = process.env.PORT || 3000;
 
 // 인증 페이지로 리다이렉트하는 라우트
-app.get("/auth", (req, res) => {
-  const authUrl = getAuthUrl();
+app.get("/auth-cafe24", (req, res) => {
+  const authUrl = getAuthUrlCafe24();
   res.redirect(authUrl);
 });
 
 // 리다이렉트 URI로 설정한 경로, 인증 코드를 받아 토큰을 요청
-app.get("/callback", async (req, res) => {
+app.get("/callback-cafe24", async (req, res) => {
   try {
     const tokens = await fetchToken(req.query.code);
     res.cookie("accessToken", tokens.access_token, {
@@ -46,7 +50,7 @@ app.get("/callback", async (req, res) => {
 });
 
 // 주문 목록을 받아오고 구글 스프레드시트를 업데이트하는 라우트
-app.get("/update-spreadsheet", async (req, res) => {
+app.get("/update-cafe24", async (req, res) => {
   try {
     const accessToken = req.cookies.accessToken;
     if (!accessToken) {
@@ -90,6 +94,34 @@ function getDateRange(daysAgo) {
   const endDate = today.toISOString().split("T")[0];
   return { startDate, endDate };
 }
+
+// Adding a new route for testing purposes
+app.get("/test-fetch-naver", async (req, res) => {
+  try {
+    const authToken = await fetchAuthToken();
+    const kstOffset = 9 * 60; // KST는 UTC보다 9시간 앞서 있음
+    const now = new Date(new Date().getTime() + kstOffset * 60000);
+
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const lastChangedFrom = sevenDaysAgo.toISOString().replace("Z", "+09:00");
+
+    // 현재 시간에서 10분을 빼고 KST로 설정
+    const tenMinutesAgo = new Date(now.getTime() - 1 * 24 * 60 * 1000);
+    const lastChangedTo = tenMinutesAgo.toISOString().replace("Z", "+09:00");
+
+    const data = await fetchLastChangedProductOrders(
+      authToken.access_token,
+      lastChangedFrom,
+      lastChangedTo
+    );
+
+    res.json(data); // Sending back the fetched data as a response
+  } catch (error) {
+    handleError(res, error);
+  }
+});
+
+// The rest of your server setup remains the same
 
 function handleError(res, error) {
   console.error("Error status:", error.response?.status || "No status");

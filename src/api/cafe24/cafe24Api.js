@@ -6,7 +6,7 @@ const clientSecret = process.env.CAFE24_CLIENT_SECRET;
 const redirectUri = process.env.CAFE24_REDIRECT_URI;
 
 // 인증 페이지 URL 생성
-function getAuthUrl() {
+function getAuthUrlCafe24() {
   const authUrl = `https://talk2her.cafe24api.com/api/v2/oauth/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=mall.read_order&state=12345`;
   return authUrl;
 }
@@ -131,7 +131,7 @@ async function fetchOrdersWithStatus(
 }
 
 module.exports = {
-  getAuthUrl,
+  getAuthUrlCafe24,
   fetchToken,
   fetchOrdersCount,
   fetchAllOrders,
