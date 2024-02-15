@@ -67,8 +67,7 @@ async function fetchAuthToken() {
 async function fetchLastChangedProductOrders(
   authToken,
   lastChangedFrom,
-  lastChangedTo,
-  limitCount = 300
+  lastChangedTo
 ) {
   const endpoint =
     "https://api.commerce.naver.com/external/v1/pay-order/seller/product-orders/last-changed-statuses";
@@ -91,5 +90,37 @@ async function fetchLastChangedProductOrders(
     throw error;
   }
 }
+/**
+ * 상품 주문 상세 내역 조회
+ */
+async function fetchProductOrderDetails(authToken, productOrderIds) {
+  const endpoint =
+    "https://api.commerce.naver.com/external/v1/pay-order/seller/product-orders/query";
+  console.log(productOrderIds);
 
-module.exports = { fetchAuthToken, fetchLastChangedProductOrders };
+  try {
+    const response = await axios.post(
+      endpoint,
+      {
+        productOrderIds,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    return response.data; // 조회된 상품 주문 상세 내역 반환
+  } catch (error) {
+    console.error("상품 주문 상세 내역 조회 중 오류 발생:", error);
+    throw error;
+  }
+}
+
+module.exports = {
+  fetchAuthToken,
+  fetchLastChangedProductOrders,
+  fetchProductOrderDetails,
+};
