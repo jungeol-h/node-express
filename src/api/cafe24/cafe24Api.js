@@ -81,6 +81,8 @@ async function fetchAllOrders(accessToken, startDate, endDate, totalOrders) {
     offset += limit;
     totalOrders -= limit > totalOrders ? totalOrders : limit;
   }
+  console.log("allOrders[0] : ");
+  console.log(allOrders[0]);
 
   return allOrders;
 }

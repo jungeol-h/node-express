@@ -1,0 +1,23 @@
+module.exports = (sequelize, DataTypes) => {
+  const Order = sequelize.define(
+    "Order",
+    {
+      order_id: {
+        type: DataTypes.STRING,
+        primaryKey: true,
+      },
+      shop_num: DataTypes.INTEGER,
+      payment_amount: DataTypes.DECIMAL,
+      order_date: DataTypes.DATE,
+      order_name: DataTypes.STRING,
+      shipping_fee: DataTypes.DECIMAL,
+      // 다른 필드들도 여기에 정의합니다.
+    },
+    {
+      tableName: "Orders",
+      timestamps: false,
+    }
+  );
+
+  return Order;
+};

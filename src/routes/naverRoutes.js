@@ -29,7 +29,7 @@ router.get("/test-fetch", async (req, res) => {
     const lastChangedFrom = sevenDaysAgo.toISOString().replace("Z", "+09:00");
 
     // 현재 시간에서 10분을 빼고 KST로 설정
-    const tenMinutesAgo = new Date(now.getTime() - 1 * 24 * 60 * 1000);
+    const tenMinutesAgo = new Date(now.getTime() - 2 * 24 * 60 * 1000);
     const lastChangedTo = tenMinutesAgo.toISOString().replace("Z", "+09:00");
 
     const changedOrdersData = await fetchLastChangedProductOrders(
@@ -48,11 +48,14 @@ router.get("/test-fetch", async (req, res) => {
     const productOrderIds = changedOrdersData.data.lastChangeStatuses.map(
       (status) => status.productOrderId
     );
+    console.log("토큰:", authToken.access_token);
 
     const details = await fetchProductOrderDetails(
       authToken.access_token,
       productOrderIds
     );
+    console.log("첫번째 원본 JSON:");
+    console.log(details.data[0]);
     const flattenedDetails = flattenDetailsData(details.data);
 
     // 상세 정보가 포함된 데이터를 응답으로 반환
