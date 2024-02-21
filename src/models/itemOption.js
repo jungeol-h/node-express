@@ -2,12 +2,12 @@ module.exports = (sequelize, DataTypes) => {
   const ItemOption = sequelize.define(
     "ItemOption",
     {
-      option_id: {
+      option_name: {
         type: DataTypes.STRING,
         primaryKey: true,
+        allowNull: false,
+        unique: true,
       },
-      item_id: DataTypes.INTEGER,
-      option_name: DataTypes.STRING,
       option_price: DataTypes.DECIMAL,
     },
     {
@@ -15,9 +15,9 @@ module.exports = (sequelize, DataTypes) => {
       timestamps: false,
     }
   );
-
   ItemOption.associate = function (models) {
-    ItemOption.belongsTo(models.Item, { foreignKey: "item_id" });
+    ItemOption.hasMany(models.Item, { foreignKey: "option_name" });
+    ItemOption.hasMany(models.ProductOptionItem, { foreignKey: "option_name" });
   };
 
   return ItemOption;

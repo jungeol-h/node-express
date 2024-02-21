@@ -11,6 +11,7 @@ module.exports = (sequelize, DataTypes) => {
       order_date: DataTypes.DATE,
       order_name: DataTypes.STRING,
       shipping_fee: DataTypes.DECIMAL,
+      shipping_type: DataTypes.STRING,
       // 다른 필드들도 여기에 정의합니다.
     },
     {
@@ -18,6 +19,10 @@ module.exports = (sequelize, DataTypes) => {
       timestamps: false,
     }
   );
+
+  Order.associate = function (models) {
+    Order.hasMany(models.Item, { foreignKey: "order_id" });
+  };
 
   return Order;
 };

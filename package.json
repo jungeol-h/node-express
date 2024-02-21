@@ -16,11 +16,14 @@
     "googleapis": "^133.0.0",
     "http-errors": "~1.6.3",
     "morgan": "~1.9.1",
+    "multer": "^1.4.5-lts.1",
     "mysql": "^2.18.1",
+    "mysql2": "^3.9.1",
     "node-schedule": "^2.1.1",
     "nunjucks": "^3.2.3",
     "pug": "^3.0.2",
-    "sequelize": "^6.37.0"
+    "sequelize": "^6.37.0",
+    "xlsx": "^0.18.5"
   },
   "description": "Express로 구현된 Node.js 백엔드 어플리케이션 템플릿입니다. ## 🖇️ 준비 및 확인사항",
   "main": "app.js",

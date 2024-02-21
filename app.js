@@ -14,13 +14,13 @@ const db = mysql.createConnection({
 });
 db.connect();
 
-db.query("SELECT * FROM users", (error, result) => {
-  if (error) return console.log(error, "check");
+// db.query("SELECT * FROM users", (error, result) => {
+//   if (error) return console.log(error, "check");
 
-  console.log(result);
-});
+//   console.log(result);
+// });
 
-https: var indexRouter = require("./routes/index");
+https: var indexRouter = require("./src/routes/index");
 // var usersRouter = require('./routes/users');
 
 var app = express();
@@ -44,7 +44,9 @@ app.use("/", indexRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-  next(createError(404));
+  var err = new Error("Not Found");
+  err.status = 404;
+  next(err);
 });
 
 // error handler

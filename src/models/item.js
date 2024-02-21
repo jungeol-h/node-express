@@ -3,12 +3,14 @@ module.exports = (sequelize, DataTypes) => {
     "Item",
     {
       item_id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         primaryKey: true,
-        autoIncrement: true,
       },
       order_id: DataTypes.STRING,
-      product_id: DataTypes.INTEGER,
+      merchandise_name: DataTypes.STRING,
+      option_name: {
+        type: DataTypes.STRING,
+      },
       item_price: DataTypes.DECIMAL,
       item_count: DataTypes.INTEGER,
       // 다른 필드들도 여기에 정의합니다.
@@ -21,6 +23,7 @@ module.exports = (sequelize, DataTypes) => {
 
   Item.associate = function (models) {
     Item.belongsTo(models.Order, { foreignKey: "order_id" });
+    Item.belongsTo(models.ItemOption, { foreignKey: "option_name" });
   };
 
   return Item;

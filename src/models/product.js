@@ -2,11 +2,11 @@ module.exports = (sequelize, DataTypes) => {
   const Product = sequelize.define(
     "Product",
     {
-      product_id: {
-        type: DataTypes.INTEGER,
+      product_name: {
+        type: DataTypes.STRING,
         primaryKey: true,
       },
-      product_name: DataTypes.STRING,
+
       // 여기에 추가적인 필드를 정의할 수 있습니다.
     },
     {
@@ -15,5 +15,8 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
 
+  Product.associate = function (models) {
+    Product.hasMany(models.ProductOptionItem, { foreignKey: "product_name" });
+  };
   return Product;
 };

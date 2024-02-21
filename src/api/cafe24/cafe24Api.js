@@ -70,6 +70,7 @@ async function fetchAllOrders(accessToken, startDate, endDate, totalOrders) {
           start_date: startDate,
           end_date: endDate,
           payment_status: paymentStatus,
+          day_type: "pay_date",
           limit,
           offset,
           embed: "items",

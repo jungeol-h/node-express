@@ -76,9 +76,9 @@ async function writeToSpreadsheet(orderData, sheetName, platform) {
     console.log("기존 주문 목록을 조회하는 중...");
     const existingOrderIds = await getOrderIdswithRow(sheets, sheetName);
 
-    console.log("시트 속성을 가져오는 중...");
+    // console.log("시트 속성을 가져오는 중...");
     const attributes = await getSheetProperties(sheets, sheetName);
-    console.log(`시트 속성: ${attributes.join(", ")}`);
+    // console.log(`시트 속성: ${attributes.join(", ")}`);
     console.log("새로운 주문을 필터링하는 중...");
 
     let newOrders;
@@ -154,7 +154,7 @@ async function updateCancellationSheet(orderData, sheetName, platform) {
     // 'cafe24_취소' 시트의 기존 order_id 목록 조회
     const existingOrderIds = await getOrderIdswithRow(sheets, sheetName);
 
-    console.log("시트 속성을 가져오는 중...");
+    // console.log("시트 속성을 가져오는 중...");
     const attributes = await getSheetProperties(sheets, sheetName);
 
     console.log(

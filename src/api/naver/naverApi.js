@@ -96,7 +96,7 @@ async function fetchLastChangedProductOrders(
 async function fetchProductOrderDetails(authToken, productOrderIds) {
   const endpoint =
     "https://api.commerce.naver.com/external/v1/pay-order/seller/product-orders/query";
-  console.log(productOrderIds);
+  //   console.log(productOrderIds);
 
   try {
     const response = await axios.post(
