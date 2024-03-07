@@ -69,4 +69,22 @@ router.get("/sales-by-product", async (req, res) => {
   }
 });
 
+router.get("/test", async (req, res) => {
+  try {
+    const test = await statService.updateProductStatistics();
+    res.json({
+      success: true,
+      message: "test",
+      data: {
+        test,
+      },
+    });
+  } catch (error) {
+    console.error("Error in /test route", error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while retrieving test",
+    });
+  }
+});
 module.exports = router;

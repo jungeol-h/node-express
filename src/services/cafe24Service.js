@@ -140,7 +140,7 @@ async function insertAllOrders(allOrders) {
 
 async function updateSpreadsheets(accessToken) {
   try {
-    const { startDate, endDate } = getDateRange(7); // 7일 전 날짜부터 오늘까지
+    const { startDate, endDate } = getDateRange(1); // 어제 날짜부터 오늘까지
     const totalOrders = await fetchOrdersCount(accessToken, startDate, endDate);
     const allOrders = await fetchAllOrders(
       accessToken,

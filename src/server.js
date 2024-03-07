@@ -25,7 +25,11 @@ const dummyProducts = [
   { product_name: "퉁퉁이별티" },
   { product_name: "퉁퉁이팥티" },
   { product_name: "퉁퉁이유자티" },
+  { product_name: "이노시톨" },
+  { product_name: "루이보스" },
   { product_name: "활성엽산" },
+  { product_name: "뷰티풀디" },
+  { product_name: "블렌딩티콜렉션" },
 ];
 
 const driver = () => {

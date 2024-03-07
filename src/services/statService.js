@@ -1,4 +1,12 @@
-const { Order, sequelize, Sequelize } = require("../models"); // Adjust the path as necessary
+const {
+  Order,
+  Product,
+  Item,
+  Option,
+  ProductOption,
+  sequelize,
+  Sequelize,
+} = require("../models"); // Adjust the path as necessary
 const { Op } = Sequelize;
 
 const statService = {
@@ -159,7 +167,201 @@ const statService = {
       throw error;
     }
   },
-  getMonthCountbyProduct: async () => {},
+  // 제품별 통계 객체 초기화 함수
+  initializeProductStatistics: async () => {
+    let productStatistics = {};
+
+    try {
+      // Products 모델에서 모든 제품 조회
+      const products = await Product.findAll();
+
+      // 각 제품별로 통계 객체 초기화
+      products.forEach((product) => {
+        productStatistics[product.product_id] = {
+          product: {
+            "1month": 0,
+            "2month": 0,
+            "3month": 0,
+          },
+          shipping: {
+            count: 0,
+            shipping_fee_customer: 0,
+          },
+          sales: {
+            1: 0,
+            2: 0,
+            3: 0,
+          },
+        };
+      });
+
+      return productStatistics; // 초기화된 통계 객체 반환
+    } catch (error) {
+      console.error("Error initializing product statistics:", error);
+      throw error;
+    }
+  },
+  // 제품별 통계 업데이트 함수
+  updateProductStatistics: async () => {
+    try {
+      //통계 객체 초기화
+      productStatistics = await statService.initializeProductStatistics();
+      console.log("productStatistics", productStatistics);
+      //모든 주문 불러오기
+      const orderIds = ["20240307-0000387"]; // Specify the IDs you want to retrieve
+
+      const orders = await Order.findAll({
+        // where: {
+        //   order_id: orderIds, // Filter orders by specific IDs
+        // },
+        include: [
+          {
+            model: Item,
+            include: [
+              {
+                model: Option,
+                include: [ProductOption],
+              },
+            ],
+          },
+        ],
+        // limit: 1, // Limit the number of orders to 2
+      });
+
+      console.log(
+        "가져온 주문들 ID:",
+        orders.map((order) => order.order_id)
+      );
+
+      //각 주문 순회
+      orders.forEach((order) => {
+        let productGroupsCount = new Set();
+
+        // 각 아이템의 제품군수 계산
+        order.Items.forEach((item) => {
+          console.log("🔍 아이템 확인중");
+          console.log("가져온 아이템 정보");
+          console.log(
+            item.item_id +
+              " 옵션명 " +
+              item.Option.option_name +
+              " 옵션ID " +
+              item.Option.option_id
+          );
+
+          item.Option.ProductOptions.forEach((productOption) => {
+            productGroupsCount.add(productOption.product_id); // 제품 ID를 Set에 추가
+          });
+        });
+        console.log("주문에 포함된 제품군수: " + productGroupsCount.size);
+        //제품 군수에 따라 로직 분기
+        //한 종류의 제품만 주문한 경우
+        if (productGroupsCount.size === 1) {
+          console.log("1️⃣ 한 종류의 제품만 주문한 경우");
+          //1. 제품 통계 업데이트
+          order.Items.forEach((item) => {
+            const productOption = item.Option.ProductOptions[0];
+            const product = productOption.product_id;
+            const month_1 = productOption.product_1month || 0;
+            const month_2 = productOption.product_2month || 0;
+            const month_3 = productOption.product_3month || 0;
+            console.log(
+              `1개월치: ${month_1} 2개월치: ${month_2} 3개월치: ${month_3}`
+            );
+            productStatistics[product].product["1month"] += parseInt(month_1);
+            productStatistics[product].product["2month"] += parseInt(month_2);
+            productStatistics[product].product["3month"] += parseInt(month_3);
+          });
+          //2. 배송 통계 업데이트
+          //2-1. 판매 건수 업데이트
+          const product = order.Items[0].Option.ProductOptions[0].product_id;
+          productStatistics[product].shipping.count += 1;
+
+          //2-2. 배송 고객 업데이트
+          if (order.shipping_fee) {
+            productStatistics[product].shipping.shipping_fee_customer += 3000;
+            console.log("배송비 추가: " + 3000);
+          }
+
+          //3. 매출 통계 업데이트
+          //주문 정보 내 채널id 읽고 , 그 채널에 ITEM 테이블 item_price를 statistic에 추가
+          const shop = order.shop_num;
+          order.Items.forEach((item) => {
+            const product = item.Option.ProductOptions[0].product_id;
+            const price = parseInt(item.item_price);
+            productStatistics[product].sales[shop] += price;
+            console.log(`매출 추가: ${price}`);
+          });
+        } //🔥 두 종류 이상의 제품을 주문한 경우
+        else if (productGroupsCount.size >= 2) {
+          console.log("2️⃣ 두 종류 이상의 제품을 주문한 경우");
+          //1. 제품 통계 업데이트
+          //option에 있는 ProductOptions를 통해 포함된 제품들을 확인하고, 각각 productStatistics에 업데이트
+          order.Items.forEach((item) => {
+            item.Option.ProductOptions.forEach((productOption) => {
+              const product = productOption.product_id;
+              const month_1 = productOption.product_1month || 0;
+              const month_2 = productOption.product_2month || 0;
+              const month_3 = productOption.product_3month || 0;
+              console.log(
+                `1개월치: ${month_1} 2개월치: ${month_2} 3개월치: ${month_3}`
+              );
+              productStatistics[product].product["1month"] += month_1;
+              productStatistics[product].product["2month"] += month_2;
+              productStatistics[product].product["3month"] += month_3;
+            });
+          });
+
+          //2. 배송 통계 업데이트
+          //2-1 판매 건수 업데이트
+          //order에 포함된 제품군수만큼 추가하는 방식
+          order.Items.forEach((item) => {
+            item.Option.ProductOptions.forEach((productOption) => {
+              const product = productOption.product_id;
+              productStatistics[product].shipping.count += 1;
+            });
+          });
+
+          //2-2 배송비_고객 업데이트
+          let shippingFeePerProduct;
+          switch (productGroupsCount.size) {
+            case 2:
+              shippingFeePerProduct = 1400;
+              break;
+            case 3:
+              shippingFeePerProduct = 1800;
+              break;
+            case 4:
+              shippingFeePerProduct = 2100;
+              break;
+            default:
+              shippingFeePerProduct = 3000; // 기본값 또는 예외 상황 처리
+              break;
+          }
+
+          order.Items.forEach((item) => {
+            item.Option.ProductOptions.forEach((productOption) => {
+              const product = productOption.product_id;
+              // 여기서 각 제품에 대한 배송비를 추가합니다.
+              productStatistics[product].shipping.shipping_fee_customer +=
+                shippingFeePerProduct;
+              console.log(
+                `제품 ${product}의 추가된 배송비 금액: ${shippingFeePerProduct}`
+              );
+            });
+          });
+
+          //3. 매출 통계 업데이트
+        }
+      });
+      //4. 통계 객체 반환
+      console.log("✅ 전체 통계 객체 반환");
+      console.log(JSON.stringify(productStatistics, null, 2));
+    } catch (error) {
+      console.error("Error calculating order statistics:", error);
+      throw error;
+    }
+  },
 };
 
 module.exports = statService;
