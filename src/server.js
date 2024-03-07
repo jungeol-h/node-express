@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const apiRoutes = require("./routes");
 const mysql = require("mysql");
+const cors = require("cors");
 
 const cookieParser = require("cookie-parser");
 const db = mysql.createConnection({
@@ -49,7 +50,10 @@ const driver = () => {
 driver();
 
 const app = express();
+app.use(express.json());
 app.use(cookieParser());
+app.use(cors({ origin: "*" }));
+
 app.use("/api", apiRoutes);
 app.post("/upload", upload.single("file"), (req, res) => {
   const file = req.file;

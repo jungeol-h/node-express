@@ -6,10 +6,9 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         primaryKey: true,
       },
-      order_id: DataTypes.STRING,
       merchandise_name: DataTypes.STRING,
-      option_name: {
-        type: DataTypes.STRING,
+      option_id: {
+        type: DataTypes.INTEGER,
       },
       item_price: DataTypes.DECIMAL,
       item_count: DataTypes.INTEGER,
@@ -23,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
 
   Item.associate = function (models) {
     Item.belongsTo(models.Order, { foreignKey: "order_id" });
-    Item.belongsTo(models.ItemOption, { foreignKey: "option_name" });
+    Item.belongsTo(models.Option, { foreignKey: "option_id" });
   };
 
   return Item;

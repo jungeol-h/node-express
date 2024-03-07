@@ -3,8 +3,9 @@ const xlsx = require("xlsx");
 const fs = require("fs");
 const { Order } = require("../models").sequelize.models;
 const { Item } = require("../models").sequelize.models;
-const { ItemOption } = require("../models").sequelize.models;
-const { ProductOptionItem } = require("../models").sequelize.models;
+const { Option } = require("../models").sequelize.models;
+const { ProductOption } = require("../models").sequelize.models;
+const { cleanOptionName } = require("../utils/optionProcessing");
 
 async function insertAllOrders(allOrders) {
   try {
@@ -31,11 +32,13 @@ async function insertAllOrders(allOrders) {
         console.log("Order already exists, skipping insert: ", order.order_id);
       }
 
+      const processedOptionName = cleanOptionName(order.option_name);
+
       const newItemData = {
         item_id: order.item_id,
         order_id: order.order_id,
         merchandise_name: order.merchandise_id,
-        option_name: order.option_name,
+        option_name: processedOptionName,
         item_price: parseFloat(order.price),
         item_count: order.quantity,
       };
@@ -44,27 +47,30 @@ async function insertAllOrders(allOrders) {
       });
 
       if (!itemExists) {
-        const optionExists = await ItemOption.findOne({
+        const optionExists = await Option.findOne({
           where: { option_name: newItemData.option_name },
         });
 
         if (!optionExists) {
-          await ItemOption.create({
+          createdOption = await Option.create({
             option_name: newItemData.option_name,
             option_price: order.option_price,
           });
-          console.log("ItemOption inserted: ", newItemData.option_name);
+          newItemData.option_id = createdOption.option_id;
+          console.log("Option inserted: ", createdOption.option_name);
+        } else {
+          newItemData.option_id = optionExists.option_id;
         }
 
-        const itemOptionExists = await ProductOptionItem.findOne({
-          where: { option_name: newItemData.option_name },
+        const productOptionExists = await ProductOption.findOne({
+          where: { option_id: newItemData.option_id },
         });
 
-        if (!itemOptionExists) {
-          await ProductOptionItem.create({
-            option_name: newItemData.option_name,
+        if (!productOptionExists) {
+          await ProductOption.create({
+            option_id: newItemData.option_id,
           });
-          console.log("ProductOptionItem inserted: ", newItemData.option_name);
+          console.log("ProductOption inserted: ", newItemData.option_id);
         }
 
         try {
