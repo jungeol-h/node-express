@@ -45,11 +45,14 @@ async function insertAllOrders(allOrders) {
       });
 
       if (!orderExists) {
+        // console.log("order_date: " + order.order_date);
+        const orderDate = new Date(order.order_date);
+        orderDate.setHours(orderDate.getHours() + 9); // Adding 9 hours to consider UST KST time difference
         const newOrderData = {
           order_id: order.order_id,
-          shop_num: 1, // Assuming this is static or extracted as needed
+          shop_num: order.order_place_id === "NCEHECKOUT" ? 2 : 1,
           payment_amount: parseFloat(order.payment_amount),
-          order_date: new Date(order.order_date),
+          order_date: orderDate,
           order_name: order.billing_name,
           shipping_fee: parseFloat(order.initial_order_amount.shipping_fee),
         };
@@ -68,14 +71,20 @@ async function insertAllOrders(allOrders) {
         if (item.option_value === "") {
           item.option_value = item.product_name;
         }
-        const processedOptionName = cleanOptionName(item.option_value);
+        const processedOptionName = cleanOptionName(item.option_value || "");
+        discount_price_per_item =
+          item.additional_discount_price / item.quantity;
+        actual_item_price =
+          parseInt(item.product_price) +
+          parseInt(item.option_price) -
+          parseInt(discount_price_per_item);
 
         const newItemData = {
           item_id: item.order_item_code,
           order_id: order.order_id,
           merchandise_name: item.product_name,
           option_name: processedOptionName,
-          item_price: parseFloat(item.product_price),
+          item_price: actual_item_price,
           item_count: item.quantity,
         };
 
@@ -93,10 +102,10 @@ async function insertAllOrders(allOrders) {
           if (!optionExists) {
             createdOption = await Option.create({
               option_name: newItemData.option_name,
-              option_price: item.option_price,
+              option_price: 0,
             });
             newItemData.option_id = createdOption.option_id;
-            console.log("Option inserted: ", createdOption.option_name);
+            // console.log("Option inserted: ", createdOption.option_name);
           } else {
             newItemData.option_id = optionExists.option_id;
           }
@@ -112,17 +121,17 @@ async function insertAllOrders(allOrders) {
               option_id: newItemData.option_id,
               // Additional data like option_price can be added here...
             });
-            console.log("ProductOptions inserted: ", newItemData.option_id);
+            // console.log("ProductOptions inserted: ", newItemData.option_id);
           }
 
           try {
             await Item.create(newItemData);
-            console.log(
-              "Item inserted for order ",
-              order.order_id,
-              ": ",
-              item.order_item_code
-            );
+            // console.log(
+            //   "Item inserted for order ",
+            //   order.order_id,
+            //   ": ",
+            //   item.order_item_code
+            // );
           } catch (error) {
             console.error("Error inserting item: ", error);
           }
@@ -140,7 +149,10 @@ async function insertAllOrders(allOrders) {
 
 async function updateSpreadsheets(accessToken) {
   try {
-    const { startDate, endDate } = getDateRange(1); // 어제 날짜부터 오늘까지
+    // const { startDate, endDate } = getDateRange(1);
+    //startDate, endDate를 테스트 용도로 2024-02-29, 2024-02-29로 고정
+    const startDate = "2024-02-29";
+    const endDate = "2024-02-29";
     const totalOrders = await fetchOrdersCount(accessToken, startDate, endDate);
     const allOrders = await fetchAllOrders(
       accessToken,

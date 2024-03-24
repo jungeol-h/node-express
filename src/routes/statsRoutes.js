@@ -69,6 +69,27 @@ router.get("/sales-by-product", async (req, res) => {
   }
 });
 
+router.get("/statistics-by-date", async (req, res) => {
+  try {
+    const date = req.query.date; // Get the date from the URL query parameter
+    console.log("날짜는", date);
+    const statistics = await statService.updateProductStatistics(date); // Pass the date to the updateStatistics function
+    res.json({
+      success: true,
+      message: "Statistics by date retrieved successfully",
+      data: {
+        statistics,
+      },
+    });
+  } catch (error) {
+    console.error("Error in /statistics-by-date route", error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while retrieving statistics by date",
+    });
+  }
+});
+
 router.get("/test", async (req, res) => {
   try {
     const test = await statService.updateProductStatistics();

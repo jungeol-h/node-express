@@ -14,11 +14,11 @@ const getProductById = async (id) => {
 };
 
 const updateProduct = async (id, data) => {
-  return await Product.update(data, { where: { product_option_id: id } });
+  return await Product.update(data, { where: { product_id: id } });
 };
 
 const deleteProduct = async (id) => {
-  return await Product.destroy({ where: { product_option_id: id } });
+  return await Product.destroy({ where: { product_id: id } });
 };
 
 module.exports = {

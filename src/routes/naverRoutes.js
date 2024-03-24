@@ -5,9 +5,7 @@ const naverService = require("../services/naverService"); // naverService를 imp
 
 router.get("/test-fetch", async (req, res) => {
   try {
-    // details = await naverService.handleTestFetch(); // naverService로 로직 이동
     await naverService.insertProductOrderDetails(); // naverService로 로직 이동
-    // const message = await naverService.handleTestFetch(); // naverService로 로직 이동
     res.send("업데이트 테스트!");
   } catch (error) {
     handleError(res, error);

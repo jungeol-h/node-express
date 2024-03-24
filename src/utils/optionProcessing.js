@@ -2,6 +2,9 @@ function cleanOptionName(optionName) {
   // Define prefixes to remove
   const prefixesToRemove = [
     "상품선택=",
+    "상품선택:",
+    "상품 선택:",
+    "상품 선택=",
     "세트할인=",
     "세트선택=",
     "세트 선택=",
@@ -29,6 +32,10 @@ function cleanOptionName(optionName) {
     "옵션선택=",
     "겨울에도 시원한 호박팥차:",
     "겨울에도 시원한 호박팥차=",
+    "할인구매:",
+    "할인구매=",
+    "대용량 특가 상품 선택:",
+    "대용량 특가 상품 선택=",
   ];
 
   // Remove each prefix found in the optionName
@@ -47,7 +54,8 @@ function cleanOptionName(optionName) {
   // Trim leading and trailing spaces and replace '=' with ':'
   cleanedOptionName = cleanedOptionName.trim().replace("=", ":");
 
-  return cleanedOptionName;
+  //함수 deprecated되어 인자 그대로 반환중
+  return optionName;
 }
 
 module.exports = {

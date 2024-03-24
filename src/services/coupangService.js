@@ -32,7 +32,7 @@ async function insertAllOrders(allOrders) {
         console.log("Order already exists, skipping insert: ", order.order_id);
       }
 
-      const processedOptionName = cleanOptionName(order.option_name);
+      const processedOptionName = cleanOptionName(order.option_name || "");
 
       const newItemData = {
         item_id: order.item_id,
@@ -54,7 +54,7 @@ async function insertAllOrders(allOrders) {
         if (!optionExists) {
           createdOption = await Option.create({
             option_name: newItemData.option_name,
-            option_price: order.option_price,
+            option_price: -1250,
           });
           newItemData.option_id = createdOption.option_id;
           console.log("Option inserted: ", createdOption.option_name);
@@ -70,7 +70,7 @@ async function insertAllOrders(allOrders) {
           await ProductOption.create({
             option_id: newItemData.option_id,
           });
-          console.log("ProductOption inserted: ", newItemData.option_id);
+          // console.log("ProductOption inserted: ", newItemData.option_id);
         }
 
         try {

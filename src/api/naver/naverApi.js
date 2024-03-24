@@ -64,59 +64,82 @@ async function fetchAuthToken() {
 }
 
 // Adding a new function to fetch last changed product order statuses
-async function fetchLastChangedProductOrders(
-  authToken,
-  lastChangedFrom,
-  lastChangedTo
-) {
+// This is a simplified example. Error handling and other logic might be necessary.
+// Fetches last changed product orders with pagination to handle more than 300 changes
+async function fetchLastChangedProductOrders(authToken, lastChangedFrom) {
   const endpoint =
     "https://api.commerce.naver.com/external/v1/pay-order/seller/product-orders/last-changed-statuses";
-  try {
+  let allProductOrders = [];
+  let hasMore = true;
+  let currentFrom = lastChangedFrom;
+  let moreSequence = null;
+
+  while (hasMore) {
     const params = new URLSearchParams({
-      lastChangedFrom,
-      // lastChangedTo,
-    }).toString();
-
-    const response = await axios.get(`${endpoint}?${params}`, {
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-        "Content-Type": "application/json",
-      },
+      lastChangedFrom: currentFrom,
     });
+    if (moreSequence) {
+      params.append("moreSequence", moreSequence);
+    }
 
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching last changed product orders:", error);
-    throw error;
-  }
-}
-/**
- * 상품 주문 상세 내역 조회
- */
-async function fetchProductOrderDetails(authToken, productOrderIds) {
-  const endpoint =
-    "https://api.commerce.naver.com/external/v1/pay-order/seller/product-orders/query";
-  //   console.log(productOrderIds);
-
-  try {
-    const response = await axios.post(
-      endpoint,
-      {
-        productOrderIds,
-      },
-      {
+    try {
+      const response = await axios.get(`${endpoint}?${params.toString()}`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
           "Content-Type": "application/json",
         },
-      }
-    );
+      });
 
-    return response.data; // 조회된 상품 주문 상세 내역 반환
-  } catch (error) {
-    console.error("상품 주문 상세 내역 조회 중 오류 발생:", error);
-    throw error;
+      allProductOrders = allProductOrders.concat(
+        response.data.data.lastChangeStatuses
+      );
+      hasMore = !!response.data.data.more;
+      if (hasMore) {
+        currentFrom = response.data.data.more.moreFrom;
+        moreSequence = response.data.data.more.moreSequence;
+      }
+    } catch (error) {
+      console.error("Error fetching last changed product orders:", error);
+      throw error;
+    }
   }
+
+  return allProductOrders;
+}
+
+/**
+ * 상품 주문 상세 내역 조회
+ */
+// Fetches product order details in chunks to handle more than 300 IDs
+async function fetchProductOrderDetails(authToken, productOrderIds) {
+  const endpoint =
+    "https://api.commerce.naver.com/external/v1/pay-order/seller/product-orders/query";
+  const chunkSize = 300;
+  let allDetails = [];
+
+  for (let i = 0; i < productOrderIds.length; i += chunkSize) {
+    const chunk = productOrderIds.slice(i, i + chunkSize);
+
+    try {
+      const response = await axios.post(
+        endpoint,
+        { productOrderIds: chunk },
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      allDetails = allDetails.concat(response.data);
+    } catch (error) {
+      console.error("Error fetching product order details:", error);
+      throw error;
+    }
+  }
+
+  return allDetails;
 }
 
 module.exports = {
