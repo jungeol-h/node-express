@@ -32,7 +32,7 @@ router.get("/callback", async (req, res) => {
     res.cookie("accessToken", access_token, { httpOnly: true, secure: true });
     res.cookie("refreshToken", refresh_token, { httpOnly: true, secure: true });
 
-    res.send("인증 완료! 구글 스프레드시트를 업데이트 할 준비가 되었습니다.");
+    res.send("cafe24 인증 완료! 창을 닫아주세요.");
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("인증 중 에러 발생");
