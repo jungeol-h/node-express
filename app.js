@@ -178,7 +178,7 @@ app.listen(port, () => {
     try {
       console.log("⏰ 10분마다 실행되는 로직 시작");
       const lastChangedFromInput = new Date(
-        Date.now() - 24 * 60 * 60 * 1000
+        Date.now() - 10 * 60 * 60 * 1000
       ).toISOString();
       await naverService.insertProductOrderDetails(lastChangedFromInput);
       console.log("상품 주문 세부 정보 업데이트 완료");
