@@ -142,6 +142,7 @@ async function insertAllOrders(allOrders) {
         }
       }
     }
+    console.log("Orders and items inserted successfully");
   } catch (error) {
     console.error("Error processing orders and items: ", error);
   }

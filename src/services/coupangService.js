@@ -86,6 +86,7 @@ async function insertAllOrders(allOrders) {
         // );
       }
     }
+    console.log("Orders and items inserted successfully");
   } catch (error) {
     console.error("Error inserting order: ", error);
   }

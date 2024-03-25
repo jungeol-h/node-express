@@ -158,6 +158,7 @@ async function insertProductOrderDetails(lastChangedFromInput) {
         // console.log(`Item already exists, skipping: ${newItemData.item_id}`);
       }
     }
+    console.log("Product order details inserted successfully");
   } catch (error) {
     console.error("Error inserting product order details: ", error);
   }
