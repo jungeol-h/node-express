@@ -28,7 +28,9 @@ const { sequelize } = require("./src/models/index.js");
 const { Product } = require("./src/models").sequelize.models;
 // Express 앱 초기화
 const app = express();
-app.use(morgan("combined"));
+
+// app.use(morgan("combined"));
+
 // Or, to log into winston
 app.use(
   morgan("combined", { stream: { write: (message) => logger.info(message) } })
