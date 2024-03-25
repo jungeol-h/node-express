@@ -4,20 +4,23 @@
     "password": "4673",
     "database": "database_development",
     "host": "mariadb",
-    "dialect": "mariadb"
+    "dialect": "mariadb",
+    "logging": false
   },
   "test": {
     "username": "root",
     "password": "4673",
     "database": "database_test",
     "host": "mariadb",
-    "dialect": "mariadb"
+    "dialect": "mariadb",
+    "logging": false
   },
   "production": {
     "username": "root",
     "password": "4673",
     "database": "database_production",
     "host": "mariadb",
-    "dialect": "mariadb"
+    "dialect": "mariadb",
+    "logging": false
   }
 }
