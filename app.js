@@ -31,6 +31,7 @@ const {
   saveTokens,
   refreshTokens,
 } = require("./src/api/cafe24/cafe24Api.js");
+const naverService = require("./src/services/naverService.js");
 
 // 뷰 엔진 설정
 app.set("views", path.join(__dirname, "views"));
@@ -167,14 +168,26 @@ async function refreshAccessToken() {
   }
 }
 
-// 서버 시작 시 토큰 갱신 시도
-refreshAccessToken();
-
-// 매 1시간마다 토큰 자동 갱신
-setInterval(refreshAccessToken, 3600 * 1000);
-
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
+
+  // 서버 시작 시 토큰 갱신 시도
+  refreshAccessToken();
+  // 매 1시간마다 토큰 자동 갱신
+  setInterval(refreshAccessToken, 3600 * 1000);
+  // 매 10분마다 naverService.insertProductOrderDetails 호출
+  setInterval(async () => {
+    try {
+      console.log("⏰ 10분마다 실행되는 로직 시작");
+      const lastChangedFromInput = new Date(
+        Date.now() - 24 * 60 * 60 * 1000
+      ).toISOString();
+      await naverService.insertProductOrderDetails(lastChangedFromInput);
+      console.log("상품 주문 세부 정보 업데이트 완료");
+    } catch (error) {
+      console.error("상품 주문 세부 정보 업데이트 에러:", error);
+    }
+  }, 600 * 1000); // 600,000밀리초 = 10분
 });
 
 module.exports = app;
