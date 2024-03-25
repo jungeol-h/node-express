@@ -32,12 +32,14 @@ function flattenDetailsData(details) {
   );
 }
 
-async function fetchAndProcessOrders() {
+async function fetchAndProcessOrders(lastChangedFromInput) {
   const authToken = await fetchAuthToken();
+
+  lastChangedFrom = new Date(lastChangedFromInput);
   //테스트로 2월 29일 00시, KSTdate 를 lastChangedFrom으로 설정
-  const lastChangedFrom = new Date("2024-02-28T00:00:00Z");
+  // const lastChangedFrom = new Date("2024-02-28T00:00:00Z");
   // lastChangedFrom.setHours(lastChangedFrom.getHours() + 9);
-  console.log("lastChangedFrom : ", lastChangedFrom.toISOString());
+  console.log("📆 lastChangedFrom : ", lastChangedFrom.toISOString());
   // const lastChangedTo = getKSTDate(0, 10);
   // console.log("lastChangedTo : ", lastChangedTo);
 
@@ -46,7 +48,7 @@ async function fetchAndProcessOrders() {
     lastChangedFrom.toISOString()
     // lastChangedTo
   );
-  console.log("changedOrdersData : ", changedOrdersData);
+  // console.log("changedOrdersData : ", changedOrdersData);
 
   if (!changedOrdersData || changedOrdersData.length === 0) {
     return [];
@@ -55,21 +57,21 @@ async function fetchAndProcessOrders() {
   const productOrderIds = changedOrdersData.map(
     (status) => status.productOrderId
   );
-  console.log("productOrderIds : ", productOrderIds);
+  // console.log("productOrderIds : ", productOrderIds);
   const details = await fetchProductOrderDetails(
     authToken.access_token,
     productOrderIds
   );
-  console.log(
-    "details : ",
-    JSON.stringify(flattenDetailsData(details), null, 2)
-  );
+  // console.log(
+  //   "details : ",
+  //   JSON.stringify(flattenDetailsData(details), null, 2)
+  // );
   return flattenDetailsData(details);
 }
 
-async function insertProductOrderDetails() {
+async function insertProductOrderDetails(lastChangedFromInput) {
   try {
-    const allOrders = await fetchAndProcessOrders();
+    const allOrders = await fetchAndProcessOrders(lastChangedFromInput);
     // console.log("allOrders[0] : ");
     // console.log(allOrders[0]);
     for (const order of allOrders) {

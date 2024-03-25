@@ -147,12 +147,11 @@ async function insertAllOrders(allOrders) {
   }
 }
 
-async function updateSpreadsheets(accessToken) {
+async function updateSpreadsheets(accessToken, date) {
   try {
     // const { startDate, endDate } = getDateRange(1);
-    //startDate, endDate를 테스트 용도로 2024-02-29, 2024-02-29로 고정
-    const startDate = "2024-02-29";
-    const endDate = "2024-02-29";
+    const startDate = `${date}T00:00:00`;
+    const endDate = `${date}T23:59:59`;
     const totalOrders = await fetchOrdersCount(accessToken, startDate, endDate);
     const allOrders = await fetchAllOrders(
       accessToken,

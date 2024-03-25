@@ -5,7 +5,12 @@ const naverService = require("../services/naverService"); // naverService를 imp
 
 router.get("/test-fetch", async (req, res) => {
   try {
-    await naverService.insertProductOrderDetails(); // naverService로 로직 이동
+    const lastChangedFromInput = new Date(
+      Date.now() - 24 * 60 * 60 * 1000
+    ).toISOString();
+
+    await naverService.insertProductOrderDetails(lastChangedFromInput); // naverService로 로직 이동
+
     res.send("업데이트 테스트!");
   } catch (error) {
     handleError(res, error);

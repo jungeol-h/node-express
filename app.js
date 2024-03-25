@@ -12,26 +12,25 @@ const xlsx = require("xlsx");
 const fs = require("fs");
 const apiRoutes = require("./src/routes");
 
-const mysql = require("mysql");
-const db = mysql.createConnection({
+const mariadb = require("mariadb");
+const pool = mariadb.createPool({
   host: process.env.DB_HOST || "localhost",
   user: process.env.DB_USER || "root",
-  password: process.env.DB_PASSWORD || "8429",
+  password: process.env.DB_PASSWORD || "4673",
   database: process.env.DB_DATABASE || "test",
   port: process.env.DB_PORT || "3306",
+  connectionLimit: 5, // 연결 풀에 유지할 최대 연결 수
 });
-const nunjucks = require("nunjucks");
+nunjucks = require("nunjucks");
 const { sequelize } = require("./src/models/index.js");
 const { Product } = require("./src/models").sequelize.models;
 // Express 앱 초기화
 const app = express();
-
-// 데이터베이스 연결 설정
-
-db.connect((err) => {
-  if (err) throw err;
-  console.log("Connected to MySQL Database.");
-});
+const {
+  loadTokens,
+  saveTokens,
+  refreshTokens,
+} = require("./src/api/cafe24/cafe24Api.js");
 
 // 뷰 엔진 설정
 app.set("views", path.join(__dirname, "views"));
@@ -148,6 +147,32 @@ app.use(function (err, req, res, next) {
 
 // 서버 시작
 const port = process.env.PORT || 3000;
+
+async function refreshAccessToken() {
+  try {
+    const { refreshToken } = await loadTokens();
+    if (!refreshToken) {
+      console.log("No refresh token available.");
+      return;
+    }
+
+    const { access_token, refresh_token } = await refreshTokens(refreshToken);
+    await saveTokens({
+      accessToken: access_token,
+      refreshToken: refresh_token,
+    });
+    console.log("🔐 토큰 리프레시 완료");
+  } catch (error) {
+    console.error("❌ 토큰 리프레시 실패", error);
+  }
+}
+
+// 서버 시작 시 토큰 갱신 시도
+refreshAccessToken();
+
+// 매 1시간마다 토큰 자동 갱신
+setInterval(refreshAccessToken, 3600 * 1000);
+
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });

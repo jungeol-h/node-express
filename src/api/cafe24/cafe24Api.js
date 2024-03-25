@@ -1,14 +1,53 @@
 const axios = require("axios");
 require("dotenv").config();
+const fs = require("fs").promises;
+const path = require("path");
 
 const clientId = process.env.CAFE24_CLIENT_ID;
 const clientSecret = process.env.CAFE24_CLIENT_SECRET;
 const redirectUri = process.env.CAFE24_REDIRECT_URI;
+const tokenFilePath = path.join(__dirname, "../token.json");
 
+async function saveTokens({ accessToken, refreshToken }) {
+  const tokens = { accessToken, refreshToken };
+  await fs.writeFile(tokenFilePath, JSON.stringify(tokens));
+}
+
+async function loadTokens() {
+  try {
+    const tokens = await fs.readFile(tokenFilePath, "utf8");
+    return JSON.parse(tokens);
+  } catch (error) {
+    console.error("Failed to load tokens:", error);
+    return null;
+  }
+}
 // 인증 페이지 URL 생성
 function getAuthUrlCafe24() {
   const authUrl = `https://talk2her.cafe24api.com/api/v2/oauth/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}&scope=mall.read_order&state=12345`;
   return authUrl;
+}
+// 리프레시 토큰을 이용하여 액세스 토큰 갱신
+async function refreshTokens(refreshToken) {
+  const credentials = Buffer.from(`${clientId}:${clientSecret}`).toString(
+    "base64"
+  );
+  const params = new URLSearchParams();
+  params.append("grant_type", "refresh_token");
+  params.append("refresh_token", refreshToken);
+
+  const response = await axios.post(
+    "https://talk2her.cafe24api.com/api/v2/oauth/token",
+    params.toString(),
+    {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization: `Basic ${credentials}`,
+      },
+    }
+  );
+
+  return response.data;
 }
 
 // 인증 코드를 사용하여 토큰 획득
@@ -82,8 +121,8 @@ async function fetchAllOrders(accessToken, startDate, endDate, totalOrders) {
     offset += limit;
     totalOrders -= limit > totalOrders ? totalOrders : limit;
   }
-  console.log("allOrders[0] : ");
-  console.log(allOrders[0]);
+  // console.log("allOrders[0] : ");
+  // console.log(allOrders[0]);
 
   return allOrders;
 }
@@ -139,4 +178,7 @@ module.exports = {
   fetchOrdersCount,
   fetchAllOrders,
   fetchOrdersWithStatus,
+  saveTokens,
+  loadTokens,
+  refreshTokens,
 };

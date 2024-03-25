@@ -1,10 +1,15 @@
 const express = require("express");
 const router = express.Router();
-const { getAuthUrlCafe24 } = require("../api/cafe24/cafe24Api");
 const {
-  handleAuthCallback,
+  getAuthUrlCafe24,
+  fetchToken,
+  saveTokens,
+} = require("../api/cafe24/cafe24Api");
+const {
+  handleAuthCallback, // Assuming you will no longer need this since we're using fetchToken directly.
   updateSpreadsheets,
 } = require("../services/cafe24Service");
+const { loadTokens } = require("../api/cafe24/cafe24Api");
 const { handleError } = require("../utils/error");
 
 router.get("/auth", (req, res) => {
@@ -14,11 +19,19 @@ router.get("/auth", (req, res) => {
 
 router.get("/callback", async (req, res) => {
   try {
-    const { accessToken, refreshToken } = await handleAuthCallback(
-      req.query.code
-    );
-    res.cookie("accessToken", accessToken, { httpOnly: true, secure: true });
-    res.cookie("refreshToken", refreshToken, { httpOnly: true, secure: true });
+    // Use the fetchToken function from cafe24Api.js to get the tokens.
+    const { access_token, refresh_token } = await fetchToken(req.query.code);
+    // Save tokens to a file using the saveTokens function from cafe24Api.js.
+    await saveTokens({
+      accessToken: access_token,
+      refreshToken: refresh_token,
+    });
+
+    // Set cookies with tokens if you still need them for other purposes,
+    // though it's recommended to use tokens from your secured storage (e.g., token file).
+    res.cookie("accessToken", access_token, { httpOnly: true, secure: true });
+    res.cookie("refreshToken", refresh_token, { httpOnly: true, secure: true });
+
     res.send("인증 완료! 구글 스프레드시트를 업데이트 할 준비가 되었습니다.");
   } catch (error) {
     console.error("Error:", error);
@@ -28,13 +41,19 @@ router.get("/callback", async (req, res) => {
 
 router.get("/update", async (req, res) => {
   try {
-    const accessToken = req.cookies.accessToken;
+    // Assuming you have a method to load tokens from the file where they were saved.
+    const { accessToken } = await loadTokens(); // Modify to suit how you handle token loading.
     if (!accessToken) {
       return res.status(401).send("액세스 토큰이 쿠키에 없습니다.");
     }
 
-    await updateSpreadsheets(accessToken);
-    res.send("스프레드시트가 성공적으로 업데이트 되었습니다.");
+    const date = req.query.date;
+    if (!date) {
+      return res.status(400).send("날짜를 입력해주세요.");
+    }
+    await updateSpreadsheets(accessToken, date);
+
+    res.send("cafe24 성공적으로 업데이트 되었습니다.");
   } catch (error) {
     handleError(res, error);
   }
