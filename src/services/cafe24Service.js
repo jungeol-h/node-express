@@ -50,7 +50,7 @@ async function insertAllOrders(allOrders) {
         orderDate.setHours(orderDate.getHours() + 9); // Adding 9 hours to consider UST KST time difference
         const newOrderData = {
           order_id: order.order_id,
-          shop_num: order.order_place_id === "NCEHECKOUT" ? 2 : 1,
+          shop_num: order.order_place_id === "NCHECKOUT" ? 2 : 1,
           payment_amount: parseFloat(order.payment_amount),
           order_date: orderDate,
           order_name: order.billing_name,
