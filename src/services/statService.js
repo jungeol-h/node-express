@@ -12,7 +12,7 @@ const { Op } = Sequelize;
 const {
   convertProductIdToProductName,
 } = require("../utils/convertProductIdToProductName");
-const logger = require("../utils/logger");
+const logger = require("../../logger");
 
 const statService = {
   getTotalPaymentAmount: async (days = 1) => {

@@ -4,11 +4,10 @@ require("dotenv").config();
 // 모듈 임포트
 
 const morgan = require("morgan");
-const winston = require("winston");
+const logger = require("./logger.js");
 const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
-const logger = require("morgan");
 const cors = require("cors");
 const multer = require("multer");
 const xlsx = require("xlsx");
