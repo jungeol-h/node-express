@@ -2,6 +2,9 @@
 require("dotenv").config();
 
 // 모듈 임포트
+
+const morgan = require("morgan");
+const winston = require("winston");
 const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
@@ -26,6 +29,11 @@ const { sequelize } = require("./src/models/index.js");
 const { Product } = require("./src/models").sequelize.models;
 // Express 앱 초기화
 const app = express();
+app.use(morgan("combined"));
+// Or, to log into winston
+app.use(
+  morgan("combined", { stream: { write: (message) => logger.info(message) } })
+);
 const {
   loadTokens,
   saveTokens,

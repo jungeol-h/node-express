@@ -12,6 +12,7 @@ const { Op } = Sequelize;
 const {
   convertProductIdToProductName,
 } = require("../utils/convertProductIdToProductName");
+const logger = require("../utils/logger");
 
 const statService = {
   getTotalPaymentAmount: async (days = 1) => {
@@ -249,7 +250,10 @@ const statService = {
       //각 주문 순회
       orders.forEach((order) => {
         let productGroupsCount = new Set();
-        console.log(
+        // console.log(
+        //   `⬛️ 주문번호 ${order.order_id} || 채널번호 ${order.shop_num} || 결제금액 ${order.payment_amount}`
+        // );
+        logger.info(
           `⬛️ 주문번호 ${order.order_id} || 채널번호 ${order.shop_num} || 결제금액 ${order.payment_amount}`
         );
 
