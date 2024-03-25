@@ -24,12 +24,12 @@ async function insertAllOrders(allOrders) {
         };
         try {
           await Order.create(newOrderData);
-          console.log("Order inserted: ", newOrderData.order_id);
+          // console.log("Order inserted: ", newOrderData.order_id);
         } catch (error) {
           console.error("Error inserting order: ", error);
         }
       } else {
-        console.log("Order already exists, skipping insert: ", order.order_id);
+        // console.log("Order already exists, skipping insert: ", order.order_id);
       }
 
       const processedOptionName = cleanOptionName(order.option_name || "");
@@ -57,7 +57,7 @@ async function insertAllOrders(allOrders) {
             option_price: -1250,
           });
           newItemData.option_id = createdOption.option_id;
-          console.log("Option inserted: ", createdOption.option_name);
+          // console.log("Option inserted: ", createdOption.option_name);
         } else {
           newItemData.option_id = optionExists.option_id;
         }
@@ -75,15 +75,15 @@ async function insertAllOrders(allOrders) {
 
         try {
           await Item.create(newItemData);
-          console.log("Item inserted: ", newItemData.item_id);
+          // console.log("Item inserted: ", newItemData.item_id);
         } catch (error) {
           console.error("Error inserting item: ", error);
         }
       } else {
-        console.log(
-          "Item already exists, skipping insert: ",
-          newItemData.item_id
-        );
+        // console.log(
+        //   "Item already exists, skipping insert: ",
+        //   newItemData.item_id
+        // );
       }
     }
   } catch (error) {

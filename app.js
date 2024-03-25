@@ -122,8 +122,6 @@ app.post("/upload", upload.single("file"), (req, res) => {
     items: rawData.filter((item) => item["노출상품ID"] !== "합 계"), // '합 계' 항목 제외
   };
 
-  console.log(transformedData);
-
   // 임시 업로드 파일 삭제
   fs.unlinkSync(filePath);
 

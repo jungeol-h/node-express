@@ -91,11 +91,11 @@ async function insertProductOrderDetails(lastChangedFromInput) {
           shipping_fee: order.deliveryFeeAmount,
           // 다른 주문 관련 필드...
         });
-        console.log(
-          `Order inserted: ${order.orderId} order_date: ${order.orderDate}`
-        );
+        // console.log(
+        //   `Order inserted: ${order.orderId} order_date: ${order.orderDate}`
+        // );
       } else {
-        console.log(`Order already exists, skipping: ${order.orderId}`);
+        // console.log(`Order already exists, skipping: ${order.orderId}`);
       }
 
       const processedOptionName = cleanOptionName(order.productOption || "");
@@ -132,7 +132,7 @@ async function insertProductOrderDetails(lastChangedFromInput) {
             option_price: 0,
           });
           newItemData.option_id = createdOption.option_id;
-          console.log(`Option inserted: ${createdOption.option_name}`);
+          // console.log(`Option inserted: ${createdOption.option_name}`);
         } else {
           newItemData.option_id = optionExists.option_id;
         }
@@ -145,17 +145,17 @@ async function insertProductOrderDetails(lastChangedFromInput) {
           await ProductOption.create({
             option_id: newItemData.option_id,
           });
-          console.log(`ProductOption inserted: ${newItemData.option_id}`);
+          // console.log(`ProductOption inserted: ${newItemData.option_id}`);
         }
 
         try {
           await Item.create(newItemData);
-          console.log("Item inserted: ", newItemData.item_id);
+          // console.log("Item inserted: ", newItemData.item_id);
         } catch (error) {
           console.error("Error inserting item: ", error);
         }
       } else {
-        console.log(`Item already exists, skipping: ${newItemData.item_id}`);
+        // console.log(`Item already exists, skipping: ${newItemData.item_id}`);
       }
     }
   } catch (error) {

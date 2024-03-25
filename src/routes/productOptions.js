@@ -27,7 +27,7 @@ router.get("/:id", async (req, res) => {
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
   const data = req.body;
-  console.log("data", data);
+  // console.log("data", data);
   try {
     await productOptionService.updateProductOption(id, data);
     console.log("ProductOption updated successfully");

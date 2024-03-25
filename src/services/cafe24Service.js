@@ -59,12 +59,12 @@ async function insertAllOrders(allOrders) {
 
         try {
           await Order.create(newOrderData);
-          console.log("Order inserted: ", newOrderData.order_id);
+          // console.log("Order inserted: ", newOrderData.order_id);
         } catch (error) {
           console.error("Error inserting order: ", error);
         }
       } else {
-        console.log("Order already exists, skipping insert: ", order.order_id);
+        // console.log("Order already exists, skipping insert: ", order.order_id);
       }
 
       for (const item of order.items) {
@@ -136,9 +136,9 @@ async function insertAllOrders(allOrders) {
             console.error("Error inserting item: ", error);
           }
         } else {
-          console.log(
-            `Item with ID ${newItemData.item_id} already exists. Skipping insert.`
-          );
+          // console.log(
+          //   `Item with ID ${newItemData.item_id} already exists. Skipping insert.`
+          // );
         }
       }
     }
