@@ -3,21 +3,21 @@
     "username": "root",
     "password": "4673",
     "database": "database_development",
-    "host": "127.0.0.1",
+    "host": "mariadb",
     "dialect": "mariadb"
   },
   "test": {
     "username": "root",
     "password": "4673",
     "database": "database_test",
-    "host": "127.0.0.1",
+    "host": "mariadb",
     "dialect": "mariadb"
   },
   "production": {
     "username": "root",
     "password": "4673",
     "database": "database_production",
-    "host": "127.0.0.1",
+    "host": "mariadb",
     "dialect": "mariadb"
   }
 }
