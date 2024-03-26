@@ -214,6 +214,7 @@ const statService = {
   // 제품별 통계 업데이트 함수
   updateProductStatistics: async (dateString) => {
     try {
+      console.log("🤖 제품 통계 작업 시작");
       // const dateString = "2024-02-29";
       //통계 객체 초기화
       productStatistics = await statService.initializeProductStatistics();
