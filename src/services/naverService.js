@@ -101,7 +101,9 @@ async function insertProductOrderDetails(lastChangedFromInput) {
       const processedOptionName = cleanOptionName(order.productOption || "");
       discount_price_per_item = order.productDiscountAmount / order.quantity;
       actual_item_price =
-        parseInt(order.unitPrice) - parseInt(discount_price_per_item);
+        parseInt(order.unitPrice) +
+        parseInt(order.optionPrice) -
+        parseInt(discount_price_per_item);
 
       const newItemData = {
         item_id: order.productOrderId,
