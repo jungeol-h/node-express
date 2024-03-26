@@ -250,17 +250,17 @@ const statService = {
       //각 주문 순회
       orders.forEach((order) => {
         let productGroupsCount = new Set();
-        // console.log(
-        //   `⬛️ 주문번호 ${order.order_id} || 채널번호 ${order.shop_num} || 결제금액 ${order.payment_amount}`
-        // );
-        logger.info(
-          `⬛️ 주문번호 ${order.order_id} || 채널번호 ${order.shop_num} || 결제금액 ${order.payment_amount}`
+        console.log(
+          `⬛️ 주문 ${order.order_id} || 채널 ${order.shop_num} || 결제금 ${order.payment_amount}`
         );
+        // logger.info(
+        //   `⬛️ 주문 ${order.order_id} || 채널 ${order.shop_num} || 결제금 ${order.payment_amount}`
+        // );
 
         // 각 아이템의 제품군수 계산
         order.Items.forEach((item) => {
           console.log(
-            `  ⏺ ${item.item_id} - 옵션이름: ${item.Option.option_name} || 옵션가격: ${item.item_price} || 옵션ID: ${item.Option.option_id}`
+            `  ⏺ ${item.item_id} - ${item.Option.option_name} || 옵션가: ${item.item_price} || 옵션ID: ${item.Option.option_id}`
           );
 
           item.Option.ProductOptions.forEach((productOption) => {
@@ -292,7 +292,7 @@ const statService = {
           //2-2. 배송 고객 업데이트
           if (order.payment_amount < 25000 && order.shop_num !== 3) {
             productStatistics[product].shipping.shipping_fee_customer += 3000;
-            console.log(`  📦 제품 ${product}  배송비 추가: 3000`);
+            process.stdout.write(`  📦 제품 ${product}  배송비: 3000`);
           }
           //2-3. 쿠팡만 특수 케이스 처리
           if (order.shop_num === 3) {
@@ -300,11 +300,11 @@ const statService = {
             if (order.Items[0].Option.option_price == 3000) {
               productStatistics[product].shipping.shipping_fee_customer += 3000;
               productStatistics[product].coupang.seller += 1;
-              console.log(`  📦 쿠팡 배송비 추가: 3000`);
+              process.stdout.write(`  📦 쿠팡 배송비: 3000`);
             } else {
               productStatistics[product].shipping.shipping_fee_customer -= 1250;
               productStatistics[product].coupang.rocket += 1;
-              console.log(`  📦 쿠팡 배송비 추가: -1250`);
+              process.stdout.write(`  📦 쿠팡 배송비: -1250`);
             }
           }
 
@@ -317,7 +317,7 @@ const statService = {
             // console.log(`제품: ${product}`);
             const price = parseInt(item.item_price) * item.item_count;
             productStatistics[product].sales[shop] += price;
-            console.log(`  ✚ 제품 ${product} 매출 추가: ${price}`);
+            process.stdout.write(`  ✚ 제품 ${product} 매출 +${price}`);
           });
         } //🔥 두 종류 이상의 제품을 주문한 경우
         else if (productGroupsCount.size >= 2) {
@@ -378,8 +378,8 @@ const statService = {
                 // 여기서 각 제품에 대한 배송비를 추가합니다.
                 productStatistics[product].shipping.shipping_fee_customer +=
                   parseInt(shippingFeePerProduct);
-                console.log(
-                  `  📦 제품 ${product}의 추가된 배송비 금액: ${shippingFeePerProduct}`
+                process.stdout.write(
+                  `  📦 제품 ${product}배송비 +${shippingFeePerProduct}`
                 );
               });
             });
@@ -410,7 +410,7 @@ const statService = {
                 const price = parseInt(item.item_price) * productShare; // 아이템 가격에 비율 적용하여 매출에 추가
                 productStatistics[product].sales[shop] +=
                   parseInt(price) * item.item_count;
-                console.log(`  ✚ 제품: ${product} 매출 추가: ${price}`);
+                process.stdout.write(`  ✚ 제품: ${product} 매출 +${price}`);
               });
             } else {
               // 한 옵션에 단일 제품만 있는 경우, 이전 로직 그대로 처리
@@ -418,7 +418,7 @@ const statService = {
               const product = productOption.product_id;
               const price = parseInt(item.item_price);
               productStatistics[product].sales[shop] += price * item.item_count;
-              console.log(`  ✚ 제품: ${product} 매출 추가: ${price}`);
+              process.stdout.write(`  ✚ 제품: ${product} 매출 +${price}`);
             }
           });
 
