@@ -5,7 +5,7 @@ const naverService = require("../services/naverService"); // naverService를 imp
 const {
   fetchAuthToken,
   fetchProductOrderDetails,
-} = require("../services/naverService");
+} = require("../api/naver/naverApi");
 
 router.get("/test-fetch", async (req, res) => {
   try {
