@@ -25,10 +25,13 @@ router.get("/get-product-order-details", async (req, res) => {
   try {
     const authToken = await fetchAuthToken();
 
-    const ids = req.query.ids;
+    let ids = req.query.ids;
     if (!ids) {
       return res.status(400).send("상품 ID를 입력해주세요.");
     }
+
+    // 문자열 ID를 배열로 변환
+    ids = Array.isArray(ids) ? ids : [ids];
 
     const details = await fetchProductOrderDetails(authToken.access_token, ids);
     res.json(details);
