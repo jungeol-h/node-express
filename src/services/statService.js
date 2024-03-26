@@ -212,7 +212,10 @@ const statService = {
     }
   },
   // 제품별 통계 업데이트 함수
-  updateProductStatistics: async (dateString) => {
+  updateProductStatistics: async (
+    dateString,
+    selectedChannels = [1, 2, 3, 4]
+  ) => {
     try {
       console.log("🤖 제품 통계 작업 시작");
       // const dateString = "2024-02-29";
@@ -232,6 +235,9 @@ const statService = {
           order_date: {
             [Op.gte]: startDate,
             [Op.lte]: endDate, // '<=' 연산자를 사용하여 endDate가 해당 날짜의 마지막 순간을 포함하도록 합니다.
+          },
+          shop_num: {
+            [Op.in]: selectedChannels,
           },
         },
         include: [

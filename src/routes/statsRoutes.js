@@ -72,8 +72,15 @@ router.get("/sales-by-product", async (req, res) => {
 router.get("/statistics-by-date", async (req, res) => {
   try {
     const date = req.query.date; // Get the date from the URL query parameter
+    const channelsQuery = req.query.channels;
+    const selectedChannels = channelsQuery
+      ? channelsQuery.split(",").map(Number)
+      : [1, 2, 3, 4];
     console.log("날짜는", date);
-    const statistics = await statService.updateProductStatistics(date); // Pass the date to the updateStatistics function
+    const statistics = await statService.updateProductStatistics(
+      date,
+      selectedChannels
+    );
     res.json({
       success: true,
       message: "Statistics by date retrieved successfully",
