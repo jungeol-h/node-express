@@ -317,7 +317,7 @@ const statService = {
             // console.log(`제품: ${product}`);
             const price = parseInt(item.item_price) * item.item_count;
             productStatistics[product].sales[shop] += price;
-            process.stdout.write(`  ✚ 제품 ${product} 매출 +${price}`);
+            console.log(`  💵 제품 ${product} 매출 +${price}`);
           });
         } //🔥 두 종류 이상의 제품을 주문한 경우
         else if (productGroupsCount.size >= 2) {
@@ -410,7 +410,7 @@ const statService = {
                 const price = parseInt(item.item_price) * productShare; // 아이템 가격에 비율 적용하여 매출에 추가
                 productStatistics[product].sales[shop] +=
                   parseInt(price) * item.item_count;
-                console.log(`  ✚ 제품: ${product} 매출 +${price}`);
+                console.log(`  💵 제품: ${product} 매출 +${price}`);
               });
             } else {
               // 한 옵션에 단일 제품만 있는 경우, 이전 로직 그대로 처리
@@ -418,7 +418,7 @@ const statService = {
               const product = productOption.product_id;
               const price = parseInt(item.item_price);
               productStatistics[product].sales[shop] += price * item.item_count;
-              console.log(`  ✚ 제품: ${product} 매출 +${price}`);
+              console.log(`  💵 제품: ${product} 매출 +${price}`);
             }
           });
 
