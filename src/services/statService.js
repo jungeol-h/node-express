@@ -234,11 +234,12 @@ const statService = {
         where: {
           order_date: {
             [Op.gte]: startDate,
-            [Op.lte]: endDate, // '<=' 연산자를 사용하여 endDate가 해당 날짜의 마지막 순간을 포함하도록 합니다.
+            [Op.lte]: endDate,
           },
           shop_num: {
             [Op.in]: selectedChannels,
           },
+          canceled: 0,
         },
         include: [
           {

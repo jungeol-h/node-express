@@ -79,6 +79,7 @@ async function insertProductOrderDetails(lastChangedFromInput) {
       const orderExists = await Order.findOne({
         where: { order_id: order.orderId },
       });
+      const isCanceled = order.productOrderStatus === "CANCELED" ? 1 : 0; // Check if the order status is CANCELED
       if (!orderExists) {
         const orderDate = new Date(order.orderDate);
         orderDate.setHours(orderDate.getHours() + 9); // Adding 9 hours to consider UST KST time difference
@@ -89,6 +90,7 @@ async function insertProductOrderDetails(lastChangedFromInput) {
           order_date: orderDate,
           order_name: order.ordererName,
           shipping_fee: order.deliveryFeeAmount,
+          canceled: isCanceled,
           // 다른 주문 관련 필드...
         });
         // console.log(
@@ -96,6 +98,10 @@ async function insertProductOrderDetails(lastChangedFromInput) {
         // );
       } else {
         // console.log(`Order already exists, skipping: ${order.orderId}`);
+        await Order.update(
+          { canceled: isCanceled },
+          { where: { order_id: order.orderId } }
+        );
       }
 
       const processedOptionName = cleanOptionName(order.productOption || "");

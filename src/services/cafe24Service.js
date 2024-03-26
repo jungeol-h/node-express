@@ -40,12 +40,16 @@ async function handleAuthCallback(code) {
 async function insertAllOrders(allOrders) {
   try {
     for (const order of allOrders) {
+      if (order.canceled === "T") {
+        continue;
+      }
       const orderExists = await Order.findOne({
         where: { order_id: order.order_id },
       });
 
       if (!orderExists) {
         // console.log("order_date: " + order.order_date);
+
         const orderDate = new Date(order.order_date);
         orderDate.setHours(orderDate.getHours() + 9); // Adding 9 hours to consider UST KST time difference
         const newOrderData = {
