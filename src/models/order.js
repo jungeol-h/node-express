@@ -12,6 +12,11 @@ module.exports = (sequelize, DataTypes) => {
       order_name: DataTypes.STRING,
       shipping_fee: DataTypes.DECIMAL,
       shipping_type: DataTypes.STRING,
+      canceled: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        defaultValue: 0,
+      },
       // 다른 필드들도 여기에 정의합니다.
     },
     {
